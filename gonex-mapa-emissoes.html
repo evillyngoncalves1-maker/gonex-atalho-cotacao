@@ -1,0 +1,1004 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gonex Viagens — Mapa de Emissões</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0B1D3A;--navy2:#1B2D5B;--gold:#F5C842;--gold2:#E8A720;
+  --cream:#F8F4EC;--cream2:#EDE8DC;--white:#FFFFFF;
+  --muted:#5A6A82;--light:#EEF2F8;--shadow:0 4px 24px rgba(11,29,58,.10);--shadow-sm:0 2px 10px rgba(11,29,58,.07);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--navy);min-height:100vh;font-size:15px}
+
+/* HEADER */
+header{background:var(--navy);position:sticky;top:0;z-index:1000;box-shadow:0 4px 32px rgba(0,0,0,.4)}
+.header-inner{max-width:1400px;margin:0 auto;padding:.8rem 1.5rem;display:flex;align-items:center;gap:1.1rem}
+.logo-wrap{width:58px;height:58px;flex-shrink:0}
+.logo-wrap svg{width:58px;height:58px}
+.htxt{flex:1}
+.htitle{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:700;color:var(--gold);letter-spacing:.5px;line-height:1.15}
+.hsub{font-size:.73rem;color:rgba(255,255,255,.55);letter-spacing:.3px;margin-top:.12rem}
+.hbadge{background:rgba(245,200,66,.15);border:1px solid rgba(245,200,66,.35);color:var(--gold);font-size:.68rem;font-weight:700;padding:.2rem .65rem;border-radius:20px;letter-spacing:.4px;white-space:nowrap}
+
+/* NAV */
+.nav-outer{background:rgba(0,0,0,.22);border-top:1px solid rgba(255,255,255,.07)}
+.nav-inner{max-width:1400px;margin:0 auto;padding:0 1.5rem;display:flex;gap:.15rem;overflow-x:auto;scrollbar-width:none}
+.nav-inner::-webkit-scrollbar{display:none}
+.nav-tab{background:transparent;border:none;border-bottom:3px solid transparent;color:rgba(255,255,255,.55);padding:.65rem .85rem;cursor:pointer;font-size:.77rem;font-weight:500;font-family:'Inter',sans-serif;white-space:nowrap;transition:all .18s;letter-spacing:.2px}
+.nav-tab:hover{color:var(--gold)}
+.nav-tab.active{color:var(--gold);border-bottom-color:var(--gold);font-weight:700}
+
+/* MAIN */
+main{max-width:1400px;margin:0 auto;padding:1.5rem 1.5rem 3rem}
+.section{display:none}
+.section.active{display:block}
+
+/* PAGE HEAD */
+.page-head{margin-bottom:1.25rem;padding-bottom:.85rem;border-bottom:1px solid var(--cream2)}
+.page-head h2{font-family:'Cormorant Garamond',serif;font-size:1.65rem;font-weight:700;color:var(--navy);margin-bottom:.2rem}
+.page-head p{color:var(--muted);font-size:.86rem}
+
+/* CARDS */
+.card{background:var(--white);border-radius:16px;padding:1.4rem;box-shadow:var(--shadow-sm);margin-bottom:1rem}
+
+/* SEARCH */
+.srow{display:flex;gap:.65rem;flex-wrap:wrap;margin-bottom:.9rem}
+.srow input,.srow select{flex:1;min-width:200px;padding:.7rem 1rem;border:2px solid var(--cream2);border-radius:10px;font-size:.9rem;font-family:'Inter',sans-serif;outline:none;color:var(--navy);background:var(--cream);transition:border-color .2s,background .2s}
+.srow input:focus,.srow select:focus{border-color:var(--gold2);background:var(--white)}
+.iata-big{font-size:1.5rem !important;font-weight:700 !important;letter-spacing:3px !important;text-transform:uppercase;max-width:160px;text-align:center}
+.btn{background:var(--navy);color:var(--white);border:none;padding:.7rem 1.25rem;border-radius:10px;cursor:pointer;font-size:.88rem;font-weight:600;font-family:'Inter',sans-serif;transition:background .18s,transform .1s;white-space:nowrap}
+.btn:hover{background:var(--navy2);transform:translateY(-1px)}
+.btn-gold{background:var(--gold);color:var(--navy)}
+.btn-gold:hover{background:var(--gold2)}
+
+/* IATA RESULT */
+.iata-result{background:var(--white);border-radius:16px;overflow:hidden;box-shadow:var(--shadow);margin-top:1rem}
+.ir-header{background:var(--navy);padding:1.25rem 1.5rem;color:var(--white)}
+.ir-city{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:700;color:var(--gold);line-height:1.1}
+.ir-meta{font-size:.82rem;color:rgba(255,255,255,.65);margin-top:.3rem;display:flex;gap:1rem;flex-wrap:wrap;align-items:center}
+.ir-badge{background:rgba(245,200,66,.2);border:1px solid rgba(245,200,66,.4);color:var(--gold);padding:.2rem .6rem;border-radius:12px;font-size:.72rem;font-weight:700}
+.exec-yes{background:rgba(39,174,96,.2);border:1px solid rgba(39,174,96,.5);color:#27ae60;padding:.2rem .6rem;border-radius:12px;font-size:.72rem;font-weight:700}
+.exec-no{background:rgba(231,76,60,.15);border:1px solid rgba(231,76,60,.4);color:#e74c3c;padding:.2rem .6rem;border-radius:12px;font-size:.72rem;font-weight:700}
+.ir-body{padding:1.25rem 1.5rem}
+.ir-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-bottom:1rem}
+.ir-block{background:var(--cream);border-radius:12px;padding:1rem}
+.ir-block-title{font-size:.75rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:.55rem}
+.ir-block-title span{margin-right:.3rem}
+
+/* HUB CHIPS */
+.hub-chips{display:flex;flex-wrap:wrap;gap:.4rem}
+.hub-chip{background:var(--navy);color:var(--gold);padding:.3rem .7rem;border-radius:8px;font-size:.82rem;font-weight:700;cursor:pointer;transition:background .15s;border:none;font-family:'Inter',sans-serif}
+.hub-chip:hover{background:var(--navy2)}
+
+/* ROUTE BOX */
+.route-box{background:linear-gradient(135deg,var(--navy),var(--navy2));border-radius:14px;padding:1.1rem 1.35rem;margin-bottom:1rem;color:var(--white)}
+.route-title{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:700;color:var(--gold);margin-bottom:.7rem}
+.route-path{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin-bottom:.6rem}
+.rp-node{background:rgba(245,200,66,.18);border:1px solid rgba(245,200,66,.4);color:var(--gold);padding:.3rem .75rem;border-radius:8px;font-weight:700;font-size:.88rem}
+.rp-arrow{color:rgba(255,255,255,.5);font-size:.9rem}
+.rp-prog{background:rgba(255,255,255,.1);color:rgba(255,255,255,.9);padding:.22rem .6rem;border-radius:7px;font-size:.77rem;font-weight:600}
+.rp-cost{background:rgba(245,200,66,.25);color:var(--gold);padding:.22rem .6rem;border-radius:7px;font-size:.77rem;font-weight:700}
+
+/* TIPBOX */
+.tipbox{background:#FFFBF0;border-left:3px solid var(--gold2);border-radius:8px;padding:.75rem 1rem;margin-top:.7rem;font-size:.83rem;color:#5A4100;line-height:1.55}
+.tipbox strong{color:var(--navy)}
+.tipbox a{color:var(--navy2);font-weight:600}
+.tipbox.green{background:#F0FFF5;border-left-color:#27ae60;color:#1a4a2e}
+.tipbox.red{background:#FFF5F5;border-left-color:#e74c3c;color:#5a0a0a}
+
+/* BADGE */
+.badge{padding:.2rem .6rem;border-radius:20px;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+.bstar{background:#FFF3CC;color:#8A5C00;border:1px solid #E8C840}
+.bone{background:#FDEAEA;color:#7B1010;border:1px solid #E09090}
+.bsky{background:#E6F0FB;color:#004E7C;border:1px solid #8AB8D8}
+.bnone{background:var(--light);color:#3A4A5A;border:1px solid #C0CDD8}
+
+/* GRIDS */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:1rem}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem}
+
+/* INFO CARDS */
+.icard{background:var(--white);border-radius:12px;padding:1.1rem;box-shadow:var(--shadow-sm)}
+.icard h3{color:var(--navy);font-size:1.05rem;font-weight:700;margin-bottom:.6rem;font-family:'Cormorant Garamond',serif;display:flex;align-items:center;gap:.4rem}
+.icard ul{list-style:none}
+.icard ul li{padding:.28rem 0;border-bottom:1px solid var(--cream2);font-size:.84rem;display:flex;align-items:flex-start;gap:.4rem;line-height:1.45}
+.icard ul li:last-child{border-bottom:none}
+.icard ul li::before{content:"✦";color:var(--gold2);flex-shrink:0;font-size:.65rem;margin-top:.2rem}
+
+/* TAGS */
+.tags{display:flex;flex-wrap:wrap;gap:.3rem}
+.tag{background:var(--light);color:var(--navy2);padding:.22rem .6rem;border-radius:7px;font-size:.76rem;font-weight:500}
+.tag.hi{background:var(--navy);color:var(--gold);font-weight:700}
+
+/* SECTION TITLES */
+.rsect{margin-bottom:2rem}
+.rtitle{background:var(--navy);color:var(--gold);padding:.6rem 1.1rem;border-radius:10px;margin-bottom:.9rem;font-size:1.05rem;font-weight:700;display:flex;align-items:center;gap:.5rem;font-family:'Cormorant Garamond',serif}
+
+/* ALLIANCE BOXES */
+.al-box{background:var(--white);border-radius:14px;overflow:hidden;box-shadow:var(--shadow-sm);margin-bottom:1.25rem}
+.al-header{padding:.9rem 1.25rem;display:flex;align-items:center;gap:.65rem;flex-wrap:wrap}
+.al-header h3{font-size:1.1rem;font-weight:700;color:var(--white);font-family:'Cormorant Garamond',serif}
+.al-header .stat{background:rgba(255,255,255,.2);padding:.2rem .65rem;border-radius:12px;font-size:.73rem;color:rgba(255,255,255,.9);font-weight:500}
+.al-body{padding:1rem 1.25rem}
+.astar-h{background:linear-gradient(135deg,#7A5000,#C28000)}
+.aone-h{background:linear-gradient(135deg,#7B0000,#B01010)}
+.asky-h{background:linear-gradient(135deg,#00377C,#005AA8)}
+.anone-h{background:linear-gradient(135deg,#2A3A4A,#44596B)}
+
+/* HUB MAP */
+.hub-section{background:var(--white);border-radius:14px;padding:1.25rem;box-shadow:var(--shadow-sm);margin-bottom:1rem}
+.hub-card{border-radius:12px;overflow:hidden;margin-bottom:.85rem;box-shadow:var(--shadow-sm)}
+.hub-head{padding:.85rem 1.1rem;color:var(--white);display:flex;align-items:center;gap:.65rem;flex-wrap:wrap}
+.hub-head h3{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:700}
+.hub-body{background:var(--cream);padding:.9rem 1.1rem}
+.hstar{background:linear-gradient(135deg,#7A5000,#B08000)}
+.hone{background:linear-gradient(135deg,#7B0000,#A01010)}
+.hsky{background:linear-gradient(135deg,#00377C,#0060A8)}
+.hind{background:linear-gradient(135deg,#1A3A2A,#2A6A4A)}
+
+/* STEPS */
+.step-card{background:var(--white);border-radius:14px;padding:1.5rem;box-shadow:var(--shadow-sm)}
+.step{display:flex;gap:1rem;margin-bottom:1.1rem;align-items:flex-start}
+.snum{background:var(--navy);color:var(--gold);width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;font-family:'Cormorant Garamond',serif;font-size:1rem}
+.scontent h4{font-weight:700;margin-bottom:.3rem;font-size:.95rem}
+.scontent p,.scontent ul{color:var(--muted);font-size:.85rem;line-height:1.6}
+.scontent ul{list-style:disc;margin-left:1rem}
+
+/* TABLES */
+.t{width:100%;border-collapse:collapse;font-size:.83rem}
+.t th{background:var(--navy);color:var(--gold);padding:.6rem .9rem;text-align:left;font-size:.78rem}
+.t td{padding:.55rem .9rem;border-bottom:1px solid var(--cream2);vertical-align:top}
+.t tr:nth-child(even) td{background:var(--cream)}
+.t tr:hover td{background:var(--cream2)}
+.t td:first-child{font-weight:600;color:var(--navy)}
+
+/* PHONE TABLE */
+.pt{width:100%;border-collapse:collapse;font-size:.84rem}
+.pt th{background:var(--navy);color:var(--gold);padding:.65rem .9rem;text-align:left;font-size:.78rem}
+.pt td{padding:.6rem .9rem;border-bottom:1px solid var(--cream2);vertical-align:middle}
+.pt tr:hover td{background:var(--cream)}
+.pt td:first-child{font-weight:700;color:var(--navy);white-space:nowrap}
+.pt td a{color:var(--gold2);text-decoration:none;font-size:.79rem;font-weight:600}
+
+/* SITES */
+.sites-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1rem}
+.site-card{background:var(--white);border-radius:12px;padding:1.1rem;box-shadow:var(--shadow-sm);display:flex;flex-direction:column;gap:.4rem;border-top:3px solid var(--gold)}
+.site-card h3{color:var(--navy);font-size:.93rem;font-weight:700}
+.site-card p{color:var(--muted);font-size:.82rem;line-height:1.45}
+.site-card a{color:var(--gold2);font-weight:700;text-decoration:none;font-size:.81rem}
+.site-card a:hover{text-decoration:underline}
+
+/* EXEC */
+.rank-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(195px,1fr));gap:.8rem}
+.rank-card{background:var(--white);border-radius:12px;padding:.9rem;box-shadow:var(--shadow-sm);display:flex;align-items:center;gap:.6rem;font-weight:600;font-size:.88rem;color:var(--navy)}
+.rnum{background:var(--navy);color:var(--gold);width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.85rem;flex-shrink:0;font-family:'Cormorant Garamond',serif}
+.rank-card.gold{background:linear-gradient(135deg,#FFF3CC,#FFF8E6);border:2px solid var(--gold)}
+.rank-card.gold .rnum{background:var(--gold);color:var(--navy)}
+
+.exec-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:.8rem}
+.exec-card{background:var(--white);border-radius:12px;padding:.95rem;box-shadow:var(--shadow-sm);border-left:3px solid var(--gold)}
+.exec-card h3{color:var(--navy);font-size:.88rem;font-weight:700;margin-bottom:.3rem}
+.exec-card a{color:var(--gold2);text-decoration:none;font-size:.8rem;font-weight:600}
+
+/* MILHAS BADGE */
+.mb{background:var(--navy);color:var(--gold);padding:.15rem .5rem;border-radius:6px;font-weight:700;font-size:.76rem;white-space:nowrap}
+
+/* PARTNER CHIPS */
+.pc{display:inline-block;background:var(--light);color:var(--navy2);padding:.2rem .55rem;border-radius:6px;font-size:.72rem;font-weight:500;margin:.12rem}
+.pc.aw{background:rgba(245,200,66,.2);color:#5A3A00;border:1px solid rgba(245,200,66,.5)}
+
+/* NAT CARD */
+.nat-card{border-radius:12px;padding:1.1rem;box-shadow:var(--shadow-sm);background:var(--white)}
+.nat-azul{border-top:4px solid #0071C5}
+.nat-gol{border-top:4px solid #F37021}
+.nat-latam{border-top:4px solid #C8102E}
+
+/* REGION OPTIONS */
+.roption{border:2px solid var(--cream2);border-radius:12px;padding:1rem;margin-bottom:.7rem;transition:border-color .2s}
+.roption:hover{border-color:var(--gold)}
+.roption.best{border-color:var(--gold);background:var(--warn-bg,#FFFBF0)}
+.blbl{background:var(--navy);color:var(--gold);font-size:.69rem;font-weight:700;padding:.17rem .5rem;border-radius:7px;margin-left:.4rem}
+
+/* ACARD */
+.acard{background:var(--white);border-radius:12px;padding:1rem 1.2rem;margin-bottom:.75rem;box-shadow:var(--shadow-sm);border-left:4px solid var(--navy);transition:transform .15s,box-shadow .15s}
+.acard:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+.ahead{display:flex;align-items:center;gap:.55rem;margin-bottom:.6rem;flex-wrap:wrap}
+.aname{font-size:1.05rem;font-weight:700;color:var(--navy);font-family:'Cormorant Garamond',serif}
+.rbadge{background:rgba(245,200,66,.15);color:var(--navy2);padding:.17rem .5rem;border-radius:7px;font-size:.69rem;font-weight:600;border:1px solid rgba(245,200,66,.4)}
+.prog-lbl{color:var(--muted);font-size:.76rem;font-weight:600;margin-bottom:.35rem}
+
+/* EMPTY STATE */
+.noR{text-align:center;color:var(--muted);padding:2rem;font-size:.9rem}
+
+/* RESPONSIVE */
+@media(max-width:720px){
+  .ir-grid,.fgrid,.grid2{grid-template-columns:1fr}
+  .htitle{font-size:1.15rem}
+  .logo-wrap{width:46px;height:46px}
+  .logo-wrap svg{width:46px;height:46px}
+  main{padding:1rem .85rem 2.5rem}
+}
+
+footer{background:var(--navy);text-align:center;padding:.9rem;color:rgba(255,255,255,.4);font-size:.73rem;letter-spacing:.3px}
+footer span{color:var(--gold);font-weight:600}
+</style>
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <div class="logo-wrap">
+      <svg viewBox="0 0 16536 16536" xmlns="http://www.w3.org/2000/svg" style="fill-rule:evenodd;clip-rule:evenodd">
+        <rect x="0" y="0" width="16536" height="16536" style="fill:#0b1d3a"/>
+        <path d="M8529.745,8449.11l2186.633,4554.3l847.182,0l3031.724,-6054.568l-1920.925,0l-1498.434,3567.725l-820.012,-1996.052l-1826.168,-71.405Z" style="fill:#fff"/>
+        <path d="M9076.178,6446.451c0,0 -821.041,-1374.504 -2715.209,-1273.106c-1840.631,98.532 -2303.984,1470.269 -2303.984,1470.269c0,0 -666.128,1291.37 39.432,2740.559c705.56,1449.189 2458.892,1688.601 3902.406,1019.657l53.903,-1603.474l401.108,-9.351l1167.064,2537.686c0,0 -2522.947,2087.148 -5592.608,425.79c-3069.661,-1661.358 -1906.675,-5338.202 -1705.367,-5743.238c36.528,-73.496 789.436,-2034.84 3349.159,-2409.519c2723.005,-398.579 4253.566,1004.346 4756.542,1873.34l-1352.446,971.388Z" style="fill:#ffc107"/>
+        <path d="M6183.153,6978.14l-433.614,1617.71l4606.375,-74.803l-566.361,-1572.206l-3606.399,29.298Z" style="fill:#ffc107"/>
+      </svg>
+    </div>
+    <div class="htxt">
+      <div class="htitle">Gonex Viagens — Mapa de Emissões</div>
+      <div class="hsub">Busca por IATA · Rotas · Hubs · Alianças · Executivas · Tabelas Fixas</div>
+    </div>
+    <div class="hbadge">USO INTERNO</div>
+  </div>
+  <div class="nav-outer">
+    <div class="nav-inner">
+      <button class="nav-tab active" onclick="showTab('iata',this)">🛫 Buscar por IATA</button>
+      <button class="nav-tab" onclick="showTab('hubs',this)">🌐 Mapa de Hubs</button>
+      <button class="nav-tab" onclick="showTab('cias',this)">✈️ Buscar Cia</button>
+      <button class="nav-tab" onclick="showTab('regioes',this)">🗺️ Por Região</button>
+      <button class="nav-tab" onclick="showTab('aliances',this)">🤝 Alianças</button>
+      <button class="nav-tab" onclick="showTab('executivas',this)">💺 Executivas</button>
+      <button class="nav-tab" onclick="showTab('tabelas',this)">📋 Tabelas Fixas</button>
+      <button class="nav-tab" onclick="showTab('passoapasso',this)">🔢 Como Emitir</button>
+      <button class="nav-tab" onclick="showTab('nacionais',this)">🇧🇷 Cias Nacionais</button>
+      <button class="nav-tab" onclick="showTab('telefones',this)">📞 Telefones</button>
+      <button class="nav-tab" onclick="showTab('sites',this)">💻 Sites Úteis</button>
+    </div>
+  </div>
+</header>
+<main>
+
+<!-- ═══ IATA BUSCADOR ═══ -->
+<div id="section-iata" class="section active">
+  <div class="page-head">
+    <h2>🛫 Buscar por IATA</h2>
+    <p>Digite o código IATA do aeroporto de destino e veja o caminho completo de emissão saindo do Brasil.</p>
+  </div>
+  <div class="card">
+    <div class="srow">
+      <input type="text" id="iataInput" class="iata-big" placeholder="MCO" maxlength="3" oninput="this.value=this.value.toUpperCase()" onkeydown="if(event.key==='Enter')searchIATA()" />
+      <input type="text" id="citySearch" placeholder="Ou busque por cidade: ex. Orlando, Paris, Tóquio..." oninput="searchByCity()" />
+      <button class="btn" onclick="searchIATA()">🔍 Buscar</button>
+      <button class="btn btn-gold" onclick="clearIATA()">Limpar</button>
+    </div>
+    <div class="tags" style="gap:.35rem;margin-bottom:.5rem" id="quickIatas">
+      <span style="font-size:.75rem;color:var(--muted);font-weight:600;align-self:center">Rápido:</span>
+    </div>
+    <div id="iataResult"></div>
+  </div>
+</div>
+
+<!-- ═══ MAPA DE HUBS ═══ -->
+<div id="section-hubs" class="section">
+  <div class="page-head">
+    <h2>🌐 Mapa de Hubs Mundiais</h2>
+    <p>Os principais hubs de conexão do mundo organizados por aliança — e como chegar neles saindo do Brasil.</p>
+  </div>
+
+  <div class="hub-section">
+    <div class="rtitle">⭐ Star Alliance — Hubs Principais</div>
+    <div class="grid">
+      <div class="hub-card"><div class="hub-head hstar"><h3>🇺🇸 Newark (EWR) — United</h3><span class="stat al-header" style="background:rgba(255,255,255,.2);padding:.2rem .55rem;border-radius:10px;font-size:.72rem;color:rgba(255,255,255,.9)">Hub United Airlines</span></div><div class="hub-body"><p style="font-size:.83rem;color:var(--muted);margin-bottom:.5rem">Conexão para toda América do Norte, Ásia e Europa.</p><div class="tipbox" style="margin-top:0">🛫 <strong>Do Brasil:</strong> Azul voa VCP→EWR direto! Ou LATAM/GOL→GRU→EWR. Emitir: <strong>Azulpelomundo ou Miles&amp;Go</strong></div></div></div>
+      <div class="hub-card"><div class="hub-head hstar"><h3>🇩🇪 Frankfurt (FRA) — Lufthansa</h3></div><div class="hub-body"><p style="font-size:.83rem;color:var(--muted);margin-bottom:.5rem">Maior hub da Europa Central. Conexão para 100+ destinos.</p><div class="tipbox" style="margin-top:0">🛫 <strong>Do Brasil:</strong> LATAM voa GRU→FRA direto. Emitir: <strong>Miles&amp;Go, LatamPass ou Azulpelomundo</strong></div></div></div>
+      <div class="hub-card"><div class="hub-head hstar"><h3>🇵🇹 Lisboa (LIS) — TAP</h3></div><div class="hub-body"><p style="font-size:.83rem;color:var(--muted);margin-bottom:.5rem">Gateway Brasil-Europa. Mais cidades do Brasil com voo direto.</p><div class="tipbox" style="margin-top:0">🛫 <strong>Do Brasil:</strong> TAP voa GRU, GIG, FOR, REC, BSB→LIS. Emitir: <strong>Miles&amp;Go, Smiles ou Azulpelomundo</strong></div></div></div>
+      <div class="hub-card"><div class="hub-head hstar"><h3>🇹🇷 Istambul (IST) — Turkish</h3></div><div class="hub-body"><p style="font-size:.83rem;color:var(--muted);margin-bottom:.5rem">Maior hub do mundo em nº de destinos: 340+. Ásia, África, Europa.</p><div class="tipbox" style="margin-top:0">🛫 <strong>Do Brasil:</strong> Turkish voa GRU→IST. Emitir: <strong>Smiles (30k CC), Azulpelomundo</strong></div></div></div>
+      <div class="hub-card"><div class="hub-head hstar"><h3>🇺🇸 Chicago (ORD) — United/AA</h3></div><div class="hub-body"><p style="font-size:.83rem;color:var(--muted);margin-bottom:.5rem">Hub duplo United e AA. Interior dos EUA.</p><div class="tipbox" style="margin-top:0">🛫 <strong>Do Brasil:</strong> Via MIA ou EWR. Emitir United: <strong>Azulpelomundo</strong>. AA: <strong>Smiles</strong></div></div></div>
+      <div class="hub-card"><div class="hub-head hstar"><h3>🇸🇬 Singapura (SIN) — Singapore</h3></div><div class="hub-body"><p style="font-size:.83rem;color:var(--muted);margin-bottom:.5rem">Hub para toda a Ásia-Pacífico. Executiva #1 do mundo.</p><div class="tipbox" style="margin-top:0">🛫 <strong>Do Brasil:</strong> Via DXB ou LAX. Emitir: <strong>KrisFlyer ou Miles&amp;Go</strong></div></div></div>
+      <div class="hub-card"><div class="hub-head hstar"><h3>🇯🇵 Tóquio Narita (NRT) — ANA</h3></div><div class="hub-body"><p style="font-size:.83rem;color:var(--muted);margin-bottom:.5rem">Principal hub do Japão. ANA é Star Alliance.</p><div class="tipbox" style="margin-top:0">🛫 <strong>Do Brasil:</strong> Via LAX (United) ou DXB (Emirates). Emitir ANA: <strong>Azulpelomundo</strong></div></div></div>
+      <div class="hub-card"><div class="hub-head hstar"><h3>🇪🇹 Adis Abeba (ADD) — Ethiopian</h3></div><div class="hub-body"><p style="font-size:.83rem;color:var(--muted);margin-bottom:.5rem">Maior hub da África. 60+ destinos africanos.</p><div class="tipbox" style="margin-top:0">🛫 <strong>Do Brasil:</strong> LATAM voa GRU→ADD direto! Emitir: <strong>Miles&amp;Go ou Smiles</strong></div></div></div>
+    </div>
+  </div>
+
+  <div class="hub-section">
+    <div class="rtitle">💎 OneWorld — Hubs Principais</div>
+    <div class="grid">
+      <div class="hub-card"><div class="hub-head hone"><h3>🇺🇸 Miami (MIA) — American</h3></div><div class="hub-body"><p style="font-size:.83rem;color:var(--muted);margin-bottom:.5rem">Principal hub AA para América do Sul. Conexão EUA interior, Caribe.</p><div class="tipbox" style="margin-top:0">🛫 <strong>Do Brasil:</strong> LATAM, GOL e Azul voam GRU→MIA. Emitir AA: <strong>Smiles 7,5k/trecho</strong></div></div></div>
+      <div class="hub-card"><div class="hub-head hone"><h3>🇬🇧 Londres Heathrow (LHR) — British</h3></div><div class="hub-body"><p style="font-size:.83rem;color:var(--muted);margin-bottom:.5rem">Hub mais movimentado da Europa. Conexão mundo todo.</p><div class="tipbox" style="margin-top:0">🛫 <strong>Do Brasil:</strong> LATAM/GOL→LHR direto. Emitir BA: <strong>Avios (variável) ou Smiles</strong></div></div></div>
+      <div class="hub-card"><div class="hub-head hone"><h3>🇪🇸 Madri (MAD) — Iberia</h3></div><div class="hub-body"><p style="font-size:.83rem;color:var(--muted);margin-bottom:.5rem">Hub Iberia. Conexão para Europa e América Latina.</p><div class="tipbox" style="margin-top:0">🛫 <strong>Do Brasil:</strong> LATAM voa GRU→MAD. Emitir: <strong>Avios ou LatamPass TF</strong></div></div></div>
+      <div class="hub-card"><div class="hub-head hone"><h3>🇶🇦 Doha (DOH) — Qatar</h3></div><div class="hub-body"><p style="font-size:.83rem;color:var(--muted);margin-bottom:.5rem">Hub Qatar. Executiva top 4. Conexão Ásia, África e Oceania.</p><div class="tipbox" style="margin-top:0">🛫 <strong>Do Brasil:</strong> LATAM voa GRU→DOH. Emitir: <strong>LatamPass ou Avios</strong></div></div></div>
+      <div class="hub-card"><div class="hub-head hone"><h3>🇭🇰 Hong Kong (HKG) — Cathay</h3></div><div class="hub-body"><p style="font-size:.83rem;color:var(--muted);margin-bottom:.5rem">Hub Cathay (top 3 exec). Conexão toda a Ásia.</p><div class="tipbox" style="margin-top:0">🛫 <strong>Do Brasil:</strong> Via LHR ou DXB+HKG. Emitir Cathay: <strong>Avios ou AAdvantage</strong></div></div></div>
+      <div class="hub-card"><div class="hub-head hone"><h3>🇫🇮 Helsinki (HEL) — Finnair</h3></div><div class="hub-body"><p style="font-size:.83rem;color:var(--muted);margin-bottom:.5rem">Rota mais curta Europa→Ásia via polo norte.</p><div class="tipbox" style="margin-top:0">🛫 <strong>Do Brasil:</strong> Via FRA ou LHR. Emitir Finnair: <strong>Avios</strong></div></div></div>
+    </div>
+  </div>
+
+  <div class="hub-section">
+    <div class="rtitle">🌐 SkyTeam — Hubs Principais</div>
+    <div class="grid">
+      <div class="hub-card"><div class="hub-head hsky"><h3>🇫🇷 Paris CDG (CDG) — Air France</h3></div><div class="hub-body"><p style="font-size:.83rem;color:var(--muted);margin-bottom:.5rem">Hub Air France/KLM. FlyingBlue com promoções mensais.</p><div class="tipbox" style="margin-top:0">🛫 <strong>Do Brasil:</strong> Air France e LATAM voam GRU/GIG→CDG. Emitir: <strong>FlyingBlue</strong></div></div></div>
+      <div class="hub-card"><div class="hub-head hsky"><h3>🇳🇱 Amsterdã (AMS) — KLM</h3></div><div class="hub-body"><p style="font-size:.83rem;color:var(--muted);margin-bottom:.5rem">Hub KLM. LATAM voa direto do Brasil.</p><div class="tipbox" style="margin-top:0">🛫 <strong>Do Brasil:</strong> LATAM voa GRU→AMS. Emitir KLM: <strong>FlyingBlue</strong></div></div></div>
+      <div class="hub-card"><div class="hub-head hsky"><h3>🇺🇸 Atlanta (ATL) — Delta</h3></div><div class="hub-body"><p style="font-size:.83rem;color:var(--muted);margin-bottom:.5rem">Maior hub Delta do mundo. Interior dos EUA.</p><div class="tipbox" style="margin-top:0">🛫 <strong>Do Brasil:</strong> Via MIA ou CDG. Emitir Delta: <strong>FlyingBlue ou TF Latam (N O)</strong></div></div></div>
+      <div class="hub-card"><div class="hub-head hsky"><h3>🇰🇷 Seul Incheon (ICN) — Korean</h3></div><div class="hub-body"><p style="font-size:.83rem;color:var(--muted);margin-bottom:.5rem">Hub Korean Air. Conexão Ásia nordeste.</p><div class="tipbox" style="margin-top:0">🛫 <strong>Do Brasil:</strong> Via LAX ou NRT. Emitir Korean: <strong>Smiles ou FlyingBlue</strong></div></div></div>
+    </div>
+  </div>
+
+  <div class="hub-section">
+    <div class="rtitle">✈️ Hubs Independentes — Essenciais</div>
+    <div class="grid">
+      <div class="hub-card"><div class="hub-head hind"><h3>🇦🇪 Dubai (DXB) — Emirates</h3></div><div class="hub-body"><p style="font-size:.83rem;color:var(--muted);margin-bottom:.5rem">Hub global estratégico. Conecta quase tudo. Executiva premium.</p><div class="tipbox" style="margin-top:0">🛫 <strong>Do Brasil:</strong> Emirates voa GRU→DXB. <strong>⭐ Mais barato de Buenos Aires (EZE)!</strong> Emitir: <strong>Smiles ou Azulpelomundo</strong></div></div></div>
+      <div class="hub-card"><div class="hub-head hind"><h3>🇵🇦 Panamá (PTY) — Copa</h3></div><div class="hub-body"><p style="font-size:.83rem;color:var(--muted);margin-bottom:.5rem">Hub das Américas. Conexão toda a América Central e Caribe.</p><div class="tipbox" style="margin-top:0">🛫 <strong>Do Brasil:</strong> Copa voa GRU/GIG→PTY. Emitir: <strong>Smiles, Azulpelomundo ou ConnectMiles</strong></div></div></div>
+      <div class="hub-card"><div class="hub-head hind"><h3>🇨🇴 Bogotá (BOG) — Avianca</h3></div><div class="hub-body"><p style="font-size:.83rem;color:var(--muted);margin-bottom:.5rem">Hub Avianca (Star). Conexão Sul→Central→Norte América.</p><div class="tipbox" style="margin-top:0">🛫 <strong>Do Brasil:</strong> Avianca e LATAM voam GRU→BOG. Emitir: <strong>Smiles ou Azulpelomundo</strong></div></div></div>
+      <div class="hub-card"><div class="hub-head hind"><h3>🇦🇷 Buenos Aires (EZE) — 5ª Liberdade</h3></div><div class="hub-body"><p style="font-size:.83rem;color:var(--muted);margin-bottom:.5rem">Ponto crítico de 5ª Liberdade! Emirates, British, Swiss, Turkish, Air Canada, Ethiopian saem MAIS BARATOS daqui.</p><div class="tipbox" style="margin-top:0">🛫 <strong>Do Brasil:</strong> Voo doméstico + conexão EZE. Vale o esforço para executiva!</div></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ BUSCA CIA ═══ -->
+<div id="section-cias" class="section">
+  <div class="page-head">
+    <h2>✈️ Buscar Companhia Aérea</h2>
+    <p>Busque por nome, sigla IATA, aliança ou programa de milhas.</p>
+  </div>
+  <div class="card">
+    <div class="srow">
+      <input type="text" id="airlineSearch" placeholder="Ex: United, Emirates, TAP, Smiles, Star Alliance…" oninput="searchAirline()" onkeydown="if(event.key==='Enter')searchAirline()" />
+      <button class="btn" onclick="searchAirline()">Buscar</button>
+      <button class="btn btn-gold" onclick="clearSearch()">Limpar</button>
+    </div>
+    <div id="searchResults"></div>
+  </div>
+</div>
+
+<!-- ═══ POR REGIÃO ═══ -->
+<div id="section-regioes" class="section">
+  <div class="page-head">
+    <h2>🗺️ Buscar por Região</h2>
+    <p>Selecione a região de destino para ver rotas, hubs e programas recomendados.</p>
+  </div>
+  <div class="card">
+    <div class="fgrid">
+      <div>
+        <label style="font-weight:700;font-size:.88rem;color:var(--navy);display:block;margin-bottom:.4rem">Região de Destino</label>
+        <select id="regionSelect" onchange="findRoute()">
+          <option value="">— Selecione a região —</option>
+          <option value="América do Norte e Caribe">🇺🇸 América do Norte e Caribe</option>
+          <option value="América do Sul e Central">🌎 América do Sul e Central</option>
+          <option value="Europa">🇪🇺 Europa</option>
+          <option value="África">🌍 África</option>
+          <option value="Ásia e Oriente Médio">🌏 Ásia e Oriente Médio</option>
+          <option value="Oceânia">🇦🇺 Oceânia</option>
+          <option value="Brasil">🇧🇷 Brasil (Nacional)</option>
+        </select>
+      </div>
+      <div>
+        <label style="font-weight:700;font-size:.88rem;color:var(--navy);display:block;margin-bottom:.4rem">Companhia Operadora (opcional)</label>
+        <input type="text" id="operatorSearch" placeholder="Ex: United, TAP, Emirates…" oninput="findRoute()" />
+      </div>
+    </div>
+    <div id="routeResults"></div>
+  </div>
+</div>
+
+<!-- ═══ ALIANÇAS ═══ -->
+<div id="section-aliances" class="section">
+  <div class="page-head"><h2>🤝 Alianças Aéreas</h2><p>Como emitir em cada aliança saindo do Brasil.</p></div>
+  <div class="al-box"><div class="al-header astar-h"><h3>⭐ Star Alliance</h3><span class="stat">165 países</span><span class="stat">Busque via: United</span></div><div class="al-body"><div class="grid2"><div><div style="font-weight:700;color:var(--navy);margin-bottom:.5rem;font-size:.85rem">✈ Membros Principais</div><div class="tags"><span class="tag">United</span><span class="tag">Lufthansa</span><span class="tag">Swiss</span><span class="tag">TAP Air Portugal</span><span class="tag">Turkish Airlines</span><span class="tag">Ethiopian Airlines</span><span class="tag">South African</span><span class="tag">Air Canada</span><span class="tag">Copa Airlines</span><span class="tag">Avianca</span><span class="tag">Air China</span><span class="tag">Singapore Airlines</span><span class="tag">ANA</span><span class="tag">LOT</span><span class="tag">Aegean</span><span class="tag">SriLankan</span><span class="tag">Air India</span><span class="tag">EVA Air</span></div></div><div><div style="font-weight:700;color:var(--navy);margin-bottom:.5rem;font-size:.85rem">💳 Como Emitir</div><ul class="icard" style="box-shadow:none;padding:.5rem;background:var(--cream)"><li>Busque disponibilidade no site da <strong>United</strong> (MileagePlus)</li><li>Emita com <strong>Azulpelomundo</strong>, <strong>Smiles</strong> ou <strong>Aeroplan</strong></li><li>TAP tem tabela fixa: 35k/trecho eco via Call Center</li><li>Turkish: 30k milhas eco via Call Center (Smiles)</li></ul></div></div><div class="tipbox">⭐ <strong>Dica de Ouro:</strong> Encontrou no Seats.aero disponibilidade Star Alliance → emita com Azulpelomundo (United) ou Miles&amp;Go (TAP). Para TAP direto, Gol e Azul têm tabela fixa!</div></div></div>
+  <div class="al-box"><div class="al-header aone-h"><h3>💎 OneWorld</h3><span class="stat">900+ destinos</span><span class="stat">Busque via: American Airlines</span></div><div class="al-body"><div class="grid2"><div><div style="font-weight:700;color:var(--navy);margin-bottom:.5rem;font-size:.85rem">✈ Membros Principais</div><div class="tags"><span class="tag">American Airlines</span><span class="tag">British Airways</span><span class="tag">Iberia</span><span class="tag">Qatar Airways</span><span class="tag">LATAM Airlines</span><span class="tag">Qantas</span><span class="tag">Japan Airlines</span><span class="tag">Cathay Pacific</span><span class="tag">Finnair</span><span class="tag">Royal Air Maroc</span><span class="tag">Alaska Airlines</span><span class="tag">SriLankan</span><span class="tag">Aer Lingus</span><span class="tag">Malaysia Airlines</span></div></div><div><div style="font-weight:700;color:var(--navy);margin-bottom:.5rem;font-size:.85rem">💳 Como Emitir</div><ul class="icard" style="box-shadow:none;padding:.5rem;background:var(--cream)"><li>Busque disponibilidade via <strong>American Airlines</strong></li><li>Emita com <strong>Smiles</strong> (AA 7,5k por trecho eco)</li><li>Use <strong>Avios</strong> para British, Iberia, Qatar e Finnair</li><li>LatamPass para voos Ibéria e LATAM</li><li>MileagePlan (Alaska) para JAL é excelente!</li></ul></div></div><div class="tipbox">💎 <strong>Dica de Ouro:</strong> Smiles para AA é a pedida clássica. Para executiva JAL/Cathay, Alaska MileagePlan tem as melhores tabelas! Site Alaska para buscar voos LATAM.</div></div></div>
+  <div class="al-box"><div class="al-header asky-h"><h3>🌐 SkyTeam</h3><span class="stat">170+ países</span><span class="stat">Busque via: Air France / Virgin</span></div><div class="al-body"><div class="grid2"><div><div style="font-weight:700;color:var(--navy);margin-bottom:.5rem;font-size:.85rem">✈ Membros Principais</div><div class="tags"><span class="tag">Air France</span><span class="tag">KLM</span><span class="tag">Delta</span><span class="tag">Aeromexico</span><span class="tag">Virgin Atlantic</span><span class="tag">Korean Air</span><span class="tag">Aerolineas Argentinas</span><span class="tag">China Southern</span><span class="tag">ITA Airways</span><span class="tag">Garuda Indonesia</span><span class="tag">Saudia</span><span class="tag">EgyptAir</span><span class="tag">Kenya Airways</span></div></div><div><div style="font-weight:700;color:var(--navy);margin-bottom:.5rem;font-size:.85rem">💳 Como Emitir</div><ul class="icard" style="box-shadow:none;padding:.5rem;background:var(--cream)"><li>Busque via <strong>Air France</strong> ou <strong>Virgin Atlantic</strong></li><li>Emita com <strong>FlyingBlue</strong> (Air France/KLM)</li><li>Delta: <strong>tabela fixa LATAM</strong> (regra tarifária N O)</li><li>Korean Air: <strong>Smiles</strong> aceita direto!</li><li>Garuda Indonesia: <strong>Smiles</strong> aceita!</li></ul></div></div><div class="tipbox">🌐 <strong>Dica de Ouro:</strong> FlyingBlue tem promoções mensais incríveis (Flash Sales). Delta via TF Latam é muito vantajoso. Smiles aceita Korean Air e Garuda!</div></div></div>
+</div>
+
+<!-- ═══ EXECUTIVAS ═══ -->
+<div id="section-executivas" class="section">
+  <div class="page-head"><h2>💺 As Melhores Executivas do Mundo</h2><p>Ranking e guia completo de emissão. Fonte: Passageiro de Primeira.</p></div>
+  <div class="rsect">
+    <div class="rtitle">🏆 Top 12 Melhores Executivas</div>
+    <div class="rank-grid">
+      <div class="rank-card gold"><div class="rnum">1ª</div><div><div>Singapore Airlines</div><div style="font-size:.73rem;color:var(--muted);font-weight:400">KrisFlyer · Star Alliance</div></div></div>
+      <div class="rank-card"><div class="rnum">2ª</div><div><div>Emirates</div><div style="font-size:.73rem;color:var(--muted);font-weight:400">Skywards · Independente</div></div></div>
+      <div class="rank-card"><div class="rnum">3ª</div><div><div>Cathay Pacific</div><div style="font-size:.73rem;color:var(--muted);font-weight:400">Avios/AAdvantage · OneWorld</div></div></div>
+      <div class="rank-card"><div class="rnum">4ª</div><div><div>Qatar Airways</div><div style="font-size:.73rem;color:var(--muted);font-weight:400">Avios/LatamPass · OneWorld</div></div></div>
+      <div class="rank-card"><div class="rnum">5ª</div><div><div>ANA</div><div style="font-size:.73rem;color:var(--muted);font-weight:400">Azulpelomundo · Star</div></div></div>
+      <div class="rank-card"><div class="rnum">6ª</div><div><div>Japan Airlines</div><div style="font-size:.73rem;color:var(--muted);font-weight:400">MileagePlan (Alaska) · OneWorld</div></div></div>
+      <div class="rank-card"><div class="rnum">7ª</div><div><div>Virgin Atlantic</div><div style="font-size:.73rem;color:var(--muted);font-weight:400">Flying Club · SkyTeam</div></div></div>
+      <div class="rank-card"><div class="rnum">8ª</div><div><div>Air France</div><div style="font-size:.73rem;color:var(--muted);font-weight:400">FlyingBlue · SkyTeam</div></div></div>
+      <div class="rank-card"><div class="rnum">9ª</div><div><div>Qantas</div><div style="font-size:.73rem;color:var(--muted);font-weight:400">LatamPass/Avios · OneWorld</div></div></div>
+      <div class="rank-card"><div class="rnum">10ª</div><div><div>LATAM</div><div style="font-size:.73rem;color:var(--muted);font-weight:400">LatamPass · OneWorld</div></div></div>
+      <div class="rank-card"><div class="rnum">11ª</div><div><div>United Polaris</div><div style="font-size:.73rem;color:var(--muted);font-weight:400">Azulpelomundo · Star</div></div></div>
+      <div class="rank-card"><div class="rnum">12ª</div><div><div>TAP Air Portugal</div><div style="font-size:.73rem;color:var(--muted);font-weight:400">Miles&amp;Go · Star</div></div></div>
+    </div>
+  </div>
+  <div class="rsect">
+    <div class="rtitle">🌎 5ª Liberdade — Executiva Mais Barata</div>
+    <div class="tipbox green">💡 <strong>O que são Voos de 5ª Liberdade?</strong> São voos onde uma cia estrangeira opera um trecho entre dois países diferentes do seu país de origem. Saindo de Buenos Aires (EZE), você acessa executivas das melhores companhias do mundo por preços muito menores que saindo de GRU.</div>
+    <div class="grid" style="margin-top:.85rem">
+      <div class="icard"><h3>🛫 De Buenos Aires (EZE)</h3><ul><li><strong>Emirates</strong> — EZE→JNB, EZE→GRU→DXB</li><li><strong>British Airways</strong> — EZE→LHR</li><li><strong>Air Canada</strong> — EZE→YYZ</li><li><strong>Ethiopian Airlines</strong> — EZE→ADD</li><li><strong>Swiss</strong> — EZE→ZUR</li><li><strong>Turkish Airlines</strong> — EZE→IST</li></ul><div class="tipbox" style="margin-top:.6rem">⚡ Verifique: voo doméstico BR→EZE + Executiva saindo de EZE quase sempre é mais barato que Executiva GRU direto!</div></div>
+      <div class="icard"><h3>💳 Como Emitir 5ª Liberdade</h3><ul><li>Pesquise no <strong>Seats.aero</strong> saindo de EZE</li><li>Emirates EZE: <strong>Smiles ou Azulpelomundo</strong></li><li>British EZE: <strong>Avios ou Smiles</strong></li><li>Turkish EZE: <strong>Smiles (30k eco CC)</strong></li><li>Compre voo BR→EZE separado (pagante ou milhas)</li><li>Despache a mala só até o destino final</li></ul></div>
+    </div>
+  </div>
+  <div class="rsect">
+    <div class="rtitle">📚 Top 10 Emissões por Programa (Passageiro de Primeira)</div>
+    <div class="exec-grid">
+      <div class="exec-card"><h3>AAdvantage (American Airlines)</h3><a href="https://passageirodeprimeira.com/as-10-melhores-emissoes-em-classe-executiva-no-aadvantage/" target="_blank">Ver as 10 melhores →</a></div>
+      <div class="exec-card"><h3>Aeroplan (Air Canada)</h3><a href="https://passageirodeprimeira.com/as-10-melhores-emissoes-em-classe-executiva-no-aeroplan-da-air-canada/" target="_blank">Ver as 10 melhores →</a></div>
+      <div class="exec-card"><h3>ConnectMiles (Copa)</h3><a href="https://passageirodeprimeira.com/as-10-melhores-emissoes-em-classe-executiva-no-connectmiles-da-copa-airlines/" target="_blank">Ver as 10 melhores →</a></div>
+      <div class="exec-card"><h3>Executive Club (British)</h3><a href="https://passageirodeprimeira.com/as-10-melhores-emissoes-em-classe-executiva-no-executive-club/" target="_blank">Ver as 10 melhores →</a></div>
+      <div class="exec-card"><h3>Flying Blue (AF/KLM)</h3><a href="https://passageirodeprimeira.com/as-10-melhores-emissoes-em-classe-executiva-no-flying-blue/" target="_blank">Ver as 10 melhores →</a></div>
+      <div class="exec-card"><h3>Flying Club (Virgin)</h3><a href="https://passageirodeprimeira.com/as-10-melhores-emissoes-em-classe-executiva-no-flying-club/" target="_blank">Ver as 10 melhores →</a></div>
+      <div class="exec-card"><h3>Iberia Plus</h3><a href="https://passageirodeprimeira.com/as-10-melhores-emissoes-em-classe-executiva-no-iberia-plus/" target="_blank">Ver as 10 melhores →</a></div>
+      <div class="exec-card"><h3>KrisFlyer (Singapore)</h3><a href="https://passageirodeprimeira.com/as-10-melhores-emissoes-em-classe-executiva-no-krisflyer-da-singapore-airlines/" target="_blank">Ver as 10 melhores →</a></div>
+      <div class="exec-card"><h3>Lifemiles (Avianca)</h3><a href="https://passageirodeprimeira.com/as-10-melhores-emissoes-em-classe-executiva-no-avianca-lifemiles/" target="_blank">Ver as 10 melhores →</a></div>
+      <div class="exec-card"><h3>Mileage Plan (Alaska)</h3><a href="https://passageirodeprimeira.com/as-10-melhores-emissoes-em-classe-executiva-no-mileage-plan-da-alaska-airlines/" target="_blank">Ver as 10 melhores →</a></div>
+      <div class="exec-card"><h3>MileagePlus (United)</h3><a href="https://passageirodeprimeira.com/as-10-melhores-emissoes-em-classe-executiva-no-mileageplus-da-united/" target="_blank">Ver as 10 melhores →</a></div>
+      <div class="exec-card"><h3>Privilege Club (Qatar)</h3><a href="https://passageirodeprimeira.com/as-10-melhores-emissoes-em-classe-executiva-no-privilege-club/" target="_blank">Ver as 10 melhores →</a></div>
+      <div class="exec-card"><h3>SkyMiles (Delta)</h3><a href="https://passageirodeprimeira.com/as-10-melhores-emissoes-em-classe-executiva-no-delta-skymiles/" target="_blank">Ver as 10 melhores →</a></div>
+      <div class="exec-card"><h3>Skywards (Emirates)</h3><a href="https://passageirodeprimeira.com/as-10-melhores-emissoes-em-classe-executiva-no-emirates-skywards/" target="_blank">Ver as 10 melhores →</a></div>
+      <div class="exec-card"><h3>Suma (Air Europa)</h3><a href="https://passageirodeprimeira.com/as-10-melhores-emissoes-em-classe-executiva-no-suma-da-air-europa/" target="_blank">Ver as 10 melhores →</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ TABELAS FIXAS ═══ -->
+<div id="section-tabelas" class="section">
+  <div class="page-head"><h2>📋 Tabelas Fixas & Emissões Award</h2><p>Preços fixos em milhas por companhia e programa.</p></div>
+  <div class="rsect">
+    <div class="rtitle">🟠 GOL (Smiles) — Award por Companhia</div>
+    <div class="grid">
+      <div class="icard"><h3>🏆 Emissões Award Smiles</h3><ul>
+        <li><strong>American Airlines</strong> — <span class="mb">7.500 por trecho</span></li>
+        <li><strong>Copa Airlines</strong> — <span class="mb">12.500 por trecho</span></li>
+        <li><strong>Avianca</strong> — <span class="mb">12.000</span> (via site)</li>
+        <li><strong>TAP Air Portugal</strong> — <span class="mb">35.000 por trecho</span></li>
+        <li><strong>Air France / KLM</strong></li><li><strong>Emirates</strong> ⚠️ taxa combustível</li>
+        <li><strong>Turkish Airlines</strong> ⚠️ taxa combustível</li>
+        <li><strong>Aerolineas Argentinas</strong></li><li><strong>Aeroméxico</strong></li>
+        <li><strong>Air Canada</strong></li><li><strong>Korean Air</strong></li>
+      </ul></div>
+      <div class="icard"><h3>🤝 Todos os Parceiros Comerciais Smiles</h3><div class="tags" style="margin-top:.35rem">
+        <span class="pc aw">Aegean</span><span class="pc aw">Aer Lingus</span><span class="pc aw">Aerolíneas Arg.</span><span class="pc aw">Aeroméxico</span><span class="pc aw">Air Baltic</span><span class="pc aw">Air Canada</span><span class="pc aw">Air India</span><span class="pc aw">Air Europa</span><span class="pc aw">Air France</span><span class="pc aw">American Airlines</span><span class="pc aw">ANA</span><span class="pc aw">Avianca</span><span class="pc aw">British Airways</span><span class="pc aw">Copa Airlines</span><span class="pc aw">Emirates</span><span class="pc aw">Ethiopian</span><span class="pc aw">Etihad</span><span class="pc aw">Flybondi</span><span class="pc aw">Garuda</span><span class="pc aw">Ibéria</span><span class="pc aw">ITA Airways</span><span class="pc aw">Kenya Airways</span><span class="pc aw">KLM</span><span class="pc aw">Korean Air</span><span class="pc aw">Malaysia</span><span class="pc aw">Royal Air Maroc</span><span class="pc aw">Saudia</span><span class="pc aw">South African</span><span class="pc aw">Starlux</span><span class="pc aw">TAAG</span><span class="pc aw">TAP Portugal</span><span class="pc aw">Turkish</span><span class="pc aw">Virgin Atlantic</span><span class="pc aw">Vueling</span>
+      </div></div>
+    </div>
+  </div>
+  <div class="rsect">
+    <div class="rtitle">🔴 LATAM — Tabela Fixa e Regras</div>
+    <table class="t" style="margin-bottom:.75rem">
+      <tr><th>Companhia</th><th>Onde Buscar Disponibilidade</th><th>Regra Tarifária</th><th>Aliança</th></tr>
+      <tr><td>Delta</td><td>Virgin / Air France / Seats.aero</td><td>N O</td><td>SkyTeam</td></tr>
+      <tr><td>Aeromexico</td><td>Virgin / Air France / Seats.aero</td><td>X U</td><td>SkyTeam</td></tr>
+      <tr><td>Alaska Airlines</td><td>American Airlines / Seats.aero</td><td>X U Z</td><td>OneWorld</td></tr>
+      <tr><td>Austrian</td><td>Seats.aero / United</td><td>X I O</td><td>Star Alliance</td></tr>
+      <tr><td>British Airways</td><td>Seats.aero / American Airlines</td><td>X U Z</td><td>OneWorld</td></tr>
+      <tr><td>Cathay Pacific</td><td>Seats.aero / American Airlines</td><td>X U Z</td><td>OneWorld</td></tr>
+      <tr><td>Finnair</td><td>Seats.aero / American Airlines</td><td>X U Z</td><td>OneWorld</td></tr>
+      <tr><td>Iberia</td><td>Seats.aero / American Airlines</td><td>X U Z</td><td>OneWorld</td></tr>
+      <tr><td>Japan Airlines</td><td>Seats.aero / American Airlines</td><td>T U A</td><td>OneWorld</td></tr>
+      <tr><td>Lufthansa</td><td>Seats.aero / United</td><td>X I O</td><td>Star Alliance</td></tr>
+      <tr><td>Malaysia Airlines</td><td>Seats.aero / American Airlines</td><td>X U Z</td><td>OneWorld</td></tr>
+      <tr><td>Qantas</td><td>Seats.aero / AA / British</td><td>X U Z</td><td>OneWorld</td></tr>
+      <tr><td>Qatar Airways</td><td>Seats.aero / British</td><td>X U Z</td><td>OneWorld</td></tr>
+      <tr><td>Swiss</td><td>Seats.aero / United</td><td>X I O</td><td>Star Alliance</td></tr>
+    </table>
+    <div class="tipbox">🔑 <strong>Regra:</strong> SkyTeam → busque via Air France/Virgin | OneWorld → via British/AA | Star Alliance → via United/Aeroplan</div>
+  </div>
+  <div class="rsect">
+    <div class="rtitle">🟦 Copa Airlines (ConnectMiles)</div>
+    <div class="grid"><div class="icard"><h3>🤝 Parceiros Award Copa</h3><ul><li>Star Alliance completa</li><li>Emirates</li><li>KLM</li><li>Aeroméxico</li><li>GOL</li><li>AZUL</li></ul></div>
+    <div class="icard"><h3>📌 Tabela Fixa Copa Brasil</h3><ul><li>Tabela fixa <span class="mb">12.500 milhas</span></li><li>Milheiro Copa: R$ 75–105</li><li>⚠️ Taxa de resgate em voos de última hora</li><li>Acumule milhas Copa voando Azul</li><li>Smiles e Azul geralmente mais baratos para a própria Copa</li></ul></div></div>
+  </div>
+  <div class="tipbox">🔗 <strong>Links Oficiais:</strong> <a href="https://www.aa.com/i18n/aadvantage-program/miles/redeem/award-travel/flight-award-chart.jsp" target="_blank">AAdvantage</a> · <a href="https://latampass.latam.com/pt_br/viagem/usar-pontos-para-voar/regras-de-resgate/latam/classe-economica" target="_blank">LatamPass</a> · <a href="https://www.flytap.com/pt-br/miles-and-go/utilizar-milhas/comprar-bilhete" target="_blank">TAP Miles&amp;Go</a> · <a href="https://www.iberia.com/br/iberiaplus/partners/voo/" target="_blank">Ibéria Plus</a> · <a href="https://www.copaair.com/assets/ES-StarAllianceandPartnersAwardChart-Sentto-ES_1-OnStarAlliance.pdf" target="_blank">Copa ConnectMiles</a></div>
+</div>
+
+<!-- ═══ COMO EMITIR ═══ -->
+<div id="section-passoapasso" class="section">
+  <div class="page-head"><h2>🔢 Como Emitir Passo a Passo</h2><p>Metodologia Gonex para qualquer cotação com milhas.</p></div>
+  <div class="step-card">
+    <div class="step"><div class="snum">1</div><div class="scontent"><h4>Definição de Rota</h4><p>Use o <strong>FlightConnections</strong> para mapear rotas disponíveis origem→destino. Identifique quais companhias e hubs são necessários.</p></div></div>
+    <div class="step"><div class="snum">2</div><div class="scontent"><h4>Cotação da Pagante (Referência)</h4><p>Pesquise o valor em dinheiro para ter base de comparação:</p><ul><li>Google Voos (datas flexíveis)</li><li>ITA Matrix (tarifas avançadas)</li><li>Kiwi / Skyscanner / Decolar</li></ul></div></div>
+    <div class="step"><div class="snum">3</div><div class="scontent"><h4>Identificar Aliança da Companhia Operadora</h4><ul><li>⭐ <strong>Star Alliance</strong> → Busque disponibilidade via <strong>United</strong></li><li>💎 <strong>OneWorld</strong> → Busque via <strong>American Airlines</strong></li><li>🌐 <strong>SkyTeam</strong> → Busque via <strong>Virgin Atlantic / Air France</strong></li><li>✈️ <strong>Independente</strong> → Site da própria cia ou Seats.aero</li></ul></div></div>
+    <div class="step"><div class="snum">4</div><div class="scontent"><h4>Verificar Disponibilidade Award</h4><p>Use o <strong>Seats.aero</strong> (aba Advanced para filtrar por cia e programa). Identifique disponibilidade eco, executiva e primeira classe. Anote o programa que libera a rota.</p></div></div>
+    <div class="step"><div class="snum">5</div><div class="scontent"><h4>Escolher o Melhor Programa</h4><p>Verifique qual programa tem melhor custo por milha para a rota:</p><ul><li><strong>Nacionais:</strong> Ibéria, AA, British, Copa, TAP, Avianca, Air Canada, United</li><li><strong>Internacionais:</strong> TF TAP, TF Latam, Award Azul/GOL, TF Copa, TF AA, TF Avianca</li></ul><p>Multiplique o milheiro de resgate pelo seu milheiro médio de compra.</p></div></div>
+    <div class="step"><div class="snum">6</div><div class="scontent"><h4>Emitir!</h4><p>Realize a emissão no programa escolhido. Sempre confirme taxas de embarque, validade e regras de alteração antes de emitir.</p><p>⚠️ <strong>Último recurso — Skiplagged:</strong> Desembarque na conexão como destino final. Não permite despachar bagagem.</p></div></div>
+  </div>
+  <div class="grid" style="margin-top:1rem">
+    <div class="icard"><h3>📊 Tipos de Tarifa</h3><ul><li><strong>Comercial/Pública:</strong> Passagem em dinheiro</li><li><strong>Comercial em Milhas:</strong> Desconto em milhas no valor</li><li><strong>Award:</strong> Preço fixo em milhas (melhores amigos)</li><li><strong>Tabela Fixa:</strong> Preço fixo por companhia parceira</li><li><strong>Consolidadores:</strong> Emissão recoupante com margem ~10%</li></ul></div>
+    <div class="icard"><h3>💳 Programas de Milhas</h3><ul><li><strong>Smiles</strong> — GOL</li><li><strong>TudoAzul / Azulpelomundo</strong> — Azul</li><li><strong>LatamPass</strong> — LATAM</li><li><strong>Miles&amp;Go / Tap Miles&amp;Go</strong> — TAP</li><li><strong>AAdvantage</strong> — American Airlines</li><li><strong>MileagePlus</strong> — United</li><li><strong>Aeroplan</strong> — Air Canada</li><li><strong>ConnectMiles</strong> — Avianca/Copa</li><li><strong>FlyingBlue</strong> — Air France/KLM</li><li><strong>Avios</strong> — British/Iberia/Qatar</li><li><strong>KrisFlyer</strong> — Singapore Airlines</li><li><strong>MileagePlan</strong> — Alaska Airlines</li></ul></div>
+  </div>
+</div>
+
+<!-- ═══ NACIONAIS ═══ -->
+<div id="section-nacionais" class="section">
+  <div class="page-head"><h2>🇧🇷 Companhias Nacionais</h2><p>Guia completo de emissão com Azul, GOL e LATAM.</p></div>
+  <div class="grid">
+    <div class="nat-card nat-azul"><h3 style="color:#0071C5;margin-bottom:.65rem;font-family:'Cormorant Garamond',serif;font-size:1.2rem">💙 Azul Linhas Aéreas</h3><ul class="icard" style="box-shadow:none;padding:0;background:transparent"><li>Voos nacionais: <strong>TudoAzul</strong> (Voucher)</li><li>Voos internacionais: <strong>Azulpelomundo</strong></li><li>Award direto: Air Canada, Emirates, Copa, Turkish, TAP, United</li><li>Parceiros comerciais: Air France, British, Cathay, Ethiopian, Garuda, Iberia, JAL, KLM, Korean, Lufthansa, Qantas, Qatar, Royal Air Maroc, SAA, Singapore, Swiss, TAAG</li><li>Hub principal: VCP (Viracopos) e GRU</li></ul></div>
+    <div class="nat-card nat-gol"><h3 style="color:#F37021;margin-bottom:.65rem;font-family:'Cormorant Garamond',serif;font-size:1.2rem">🟠 GOL (Smiles)</h3><ul class="icard" style="box-shadow:none;padding:0;background:transparent"><li>Voos nacionais e internacionais: <strong>Smiles</strong></li><li>Award: AA 7,5k/trecho · Copa 12,5k · TAP 35k · Avianca 12k</li><li>Emirates e Turkish ⚠️ taxa de combustível</li><li>Aceito por 35+ parceiros internacionais</li><li>Tabela fixa TAP disponível</li></ul></div>
+    <div class="nat-card nat-latam"><h3 style="color:#C8102E;margin-bottom:.65rem;font-family:'Cormorant Garamond',serif;font-size:1.2rem">🔴 LATAM (LatamPass)</h3><ul class="icard" style="box-shadow:none;padding:0;background:transparent"><li>Voos nacionais e internacionais: <strong>LatamPass</strong></li><li>Parceiros award: Qatar, Ibéria, Qantas, Delta (TF)</li><li>Aceita Avios (Ibéria/British/Qatar)</li><li>Aceita MileagePlus (United) e Miles&amp;Go (TAP)</li><li>15 parceiros com tabela fixa</li></ul></div>
+  </div>
+  <div class="tipbox" style="margin-top:1rem">📋 <strong>Saindo do Brasil:</strong> Star Alliance → via United | OneWorld → via American Airlines | SkyTeam → via Delta/Virgin | Independentes → Smiles, Azulpelomundo ou site da cia</div>
+</div>
+
+<!-- ═══ TELEFONES ═══ -->
+<div id="section-telefones" class="section">
+  <div class="page-head"><h2>📞 Telefones e Contatos</h2><p>Todos os contatos das companhias no Brasil com horários.</p></div>
+  <div class="card" style="overflow-x:auto;padding:0">
+    <table class="pt">
+      <thead><tr><th>Companhia</th><th>Telefone(s)</th><th>Horário</th><th>Site</th></tr></thead>
+      <tbody>
+        <tr><td>🟠 GOL (Smiles)</td><td>0300 115 2121 / +55 11 3471 2973</td><td>24h</td><td><a href="https://www.voegol.com.br/atendimento/telefones" target="_blank">voegol.com.br</a></td></tr>
+        <tr><td>💙 AZUL</td><td>0800 887 1118</td><td>24h</td><td><a href="https://www.tudoazul.com" target="_blank">tudoazul.com</a></td></tr>
+        <tr><td>🔴 LATAM</td><td>0800 0123 200 / 0300 570 5700</td><td>24h</td><td><a href="https://www.latamairlines.com/br/pt/sobre-latam/contact-center" target="_blank">latamairlines.com</a></td></tr>
+        <tr><td>🇺🇸 American Airlines</td><td>—</td><td>—</td><td><a href="https://www.aa.com/i18n/customer-service/contact-american/american-customer-service.jsp" target="_blank">aa.com</a></td></tr>
+        <tr><td>🇺🇸 United Airlines</td><td>0800 16 23 232 / 11 3145 4200</td><td>24h</td><td><a href="https://www.united.com/ual/pt/br/fly/anac.html" target="_blank">united.com</a></td></tr>
+        <tr><td>🇩🇪 Lufthansa</td><td>0800 595 0728 / WhatsApp (11) 5196-2359</td><td>24h</td><td><a href="https://www.lufthansa.com/br/pt/local-page/lufthansa-in-brazil/sac" target="_blank">lufthansa.com</a></td></tr>
+        <tr><td>🇵🇹 TAP Air Portugal</td><td>0800 888 2099</td><td>24h</td><td><a href="https://www.flytap.com/pt-br/suporte/contatos" target="_blank">flytap.com</a></td></tr>
+        <tr><td>🇶🇦 Qatar Airways</td><td>11 5108 0475</td><td>09:00–17:00</td><td><a href="https://www.qatarairways.com/pt-br/inspire/call-center.html" target="_blank">qatarairways.com</a></td></tr>
+        <tr><td>🇵🇦 Copa Airlines</td><td>55 11 4933 2399</td><td>06:00–00:00</td><td><a href="https://www.copaair.com/pt-us/atendimento-ao-cliente/centro-de-chamadas/" target="_blank">copaair.com</a></td></tr>
+        <tr><td>✈️ Delta Air Lines</td><td>0800 761 0035</td><td>24h</td><td><a href="https://pt.delta.com/br/pt/need-help/overview#br-contact-us" target="_blank">delta.com</a></td></tr>
+        <tr><td>✈️ Ethiopian Airlines</td><td>+55 11 4063 5199</td><td>09:00–18:00</td><td><a href="https://www.ethiopianairlines.com/ao/pt" target="_blank">ethiopianairlines.com</a></td></tr>
+        <tr><td>🇦🇷 FlyBondi</td><td>0800 891 2754</td><td>08:00–18:00</td><td><a href="https://flybondi.com/br/canalesdeconsulta" target="_blank">flybondi.com</a></td></tr>
+        <tr><td>🇪🇸 Ibéria</td><td>11 3956 5999 / WA +34676676004 / 0800 886 82 66</td><td>24h</td><td><a href="https://www.iberia.com/br/contato/" target="_blank">iberia.com</a></td></tr>
+        <tr><td>🇮🇹 ITA Airways</td><td>0800 8913756</td><td>24h</td><td><a href="https://www.ita-airways.com/pt_br/support/contact-assistance/customer-center.html" target="_blank">ita-airways.com</a></td></tr>
+        <tr><td>🇿🇦 South African</td><td>+55 11 3174 1500 / WA +55 11 94558 3180</td><td>—</td><td><a href="https://www.flysaa.com/pt_BR/help/customer-support/contact-us" target="_blank">flysaa.com</a></td></tr>
+        <tr><td>🇨🇭 Swiss</td><td>+55 11 4700 8910</td><td>09:00–18:00</td><td><a href="https://www.swiss.com/pt/pt/customer-support/contact-us" target="_blank">swiss.com</a></td></tr>
+        <tr><td>🇦🇴 TAAG Angola</td><td>+55 11 4200 2004</td><td>08:00–22:00</td><td><a href="https://www.taag.com/pt-pt/" target="_blank">taag.com</a></td></tr>
+        <tr><td>🇹🇷 Turkish Airlines</td><td>+55 11 3878 8199</td><td>06:00–15:00</td><td><a href="https://www.turkishairlines.com/pt-int/any-questions/get-in-touch/" target="_blank">turkishairlines.com</a></td></tr>
+        <tr><td>🇬🇧 Virgin Atlantic</td><td>+5 08007248112</td><td>09:00–18:00</td><td><a href="https://help.virginatlantic.com/eu/en/contact-us/calling-from-outside-uk.html" target="_blank">virginatlantic.com</a></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ═══ SITES ÚTEIS ═══ -->
+<div id="section-sites" class="section">
+  <div class="page-head"><h2>💻 Sites Essenciais</h2><p>Ferramentas que todo assessor Gonex precisa conhecer.</p></div>
+  <div class="sites-grid">
+    <div class="site-card"><h3>🎫 SEAT.AERO</h3><p>Buscador de disponibilidade award em múltiplos programas. Use a aba Advanced para filtrar por cia e cabine. Quanto mais souber sobre alianças, mais eficiente fica!</p><a href="https://www.seat.aero" target="_blank">seat.aero →</a></div>
+    <div class="site-card"><h3>🌐 FlightConnections</h3><p>Mapa visual de conexões de voos. Essencial para definir a rota antes de buscar disponibilidade.</p><a href="https://www.flightconnections.com" target="_blank">flightconnections.com →</a></div>
+    <div class="site-card"><h3>🔍 Google Voos</h3><p>Pesquisa de voos com datas flexíveis. Use para ter o valor pagante de referência.</p><a href="https://www.google.com/travel/flights" target="_blank">google.com/travel/flights →</a></div>
+    <div class="site-card"><h3>📊 ITA Matrix</h3><p>Ferramenta avançada para busca de tarifas com filtros de companhia e escala.</p><a href="https://matrix.itasoftware.com" target="_blank">matrix.itasoftware.com →</a></div>
+    <div class="site-card"><h3>💰 TripMilhas</h3><p>Buscador de disponibilidade em milhas focado no mercado brasileiro.</p><a href="https://www.tripmilhas.com.br" target="_blank">tripmilhas.com.br →</a></div>
+    <div class="site-card"><h3>🗺️ ViajaFlux</h3><p>Buscador especializado em tarifas award e disponibilidade de milhas.</p><a href="https://www.viajaflux.com" target="_blank">viajaflux.com →</a></div>
+    <div class="site-card"><h3>💺 SeatGuru</h3><p>Mapa de assentos de aeronaves — escolha o melhor assento antes de emitir.</p><a href="https://www.seatguru.com" target="_blank">seatguru.com →</a></div>
+    <div class="site-card"><h3>✈️ FlightRadar24</h3><p>Rastreamento de voos em tempo real e verificação de rotas operadas.</p><a href="https://www.flightradar24.com" target="_blank">flightradar24.com →</a></div>
+    <div class="site-card"><h3>🐇 Skiplagged</h3><p>Último recurso — desembarque na conexão como destino final. ⚠️ Não permite despacho de bagagem.</p><a href="https://skiplagged.com" target="_blank">skiplagged.com →</a></div>
+  </div>
+</div>
+
+</main>
+<footer>Gonex Viagens &mdash; <span>Mapa de Emissões</span> &mdash; Uso Interno &bull; 2026</footer>
+<script>
+// ═══════════════════════════════════════════
+// BASE DE AEROPORTOS (150+ destinos mundiais)
+// ═══════════════════════════════════════════
+const airports = [
+  {iata:"GRU",city:"São Paulo (Guarulhos)",country:"Brasil",region:"Brasil",hubs:["MIA","EWR","LHR","MAD","LIS","CDG","DXB","IST"],airlines:["LATAM","GOL","Azul","American","United","Air France","Emirates","TAP","Iberia","Turkish"],exec:true,programs:"LatamPass/Smiles/Azulpelomundo",tip:"Hub principal do Brasil. Saída para todos os destinos internacionais."},
+  {iata:"GIG",city:"Rio de Janeiro (Galeão)",country:"Brasil",region:"Brasil",hubs:["MIA","CDG","LIS","MAD","DXB"],airlines:["LATAM","GOL","Air France","TAP","Emirates","Iberia"],exec:true,programs:"LatamPass/Smiles",tip:"Hub secundário BR. Bons voos para Europa e EUA."},
+  {iata:"BSB",city:"Brasília",country:"Brasil",region:"Brasil",hubs:["GRU","MIA","LIS"],airlines:["LATAM","GOL","Azul","TAP"],exec:false,programs:"LatamPass/Smiles",tip:"Hub doméstico forte. Conexões internacionais via GRU."},
+  {iata:"VCP",city:"Campinas (Viracopos)",country:"Brasil",region:"Brasil",hubs:["GRU","FLL","MCO","LIS","ORL"],airlines:["Azul","TAP"],exec:true,programs:"Azulpelomundo",tip:"Base da Azul. Voo direto Azul para EUA (FLL/MCO) e Europa (LIS)."},
+  {iata:"CNF",city:"Belo Horizonte (Confins)",country:"Brasil",region:"Brasil",hubs:["GRU","MIA"],airlines:["LATAM","GOL","Azul"],exec:false,programs:"LatamPass/Smiles",tip:"Hub doméstico. Conexões via GRU."},
+  {iata:"FOR",city:"Fortaleza",country:"Brasil",region:"Brasil",hubs:["LIS","MIA","GRU"],airlines:["LATAM","GOL","TAP","Azul"],exec:false,programs:"LatamPass/Smiles",tip:"Voo TAP direto para Lisboa. Boa saída para Europa."},
+  {iata:"REC",city:"Recife",country:"Brasil",region:"Brasil",hubs:["LIS","GRU"],airlines:["LATAM","GOL","TAP","Azul"],exec:false,programs:"LatamPass/Smiles",tip:"Voo TAP direto para Lisboa."},
+  {iata:"SSA",city:"Salvador",country:"Brasil",region:"Brasil",hubs:["GRU","LIS"],airlines:["LATAM","GOL","Azul"],exec:false,programs:"LatamPass/Smiles",tip:"Conexões via GRU."},
+  {iata:"POA",city:"Porto Alegre",country:"Brasil",region:"Brasil",hubs:["GRU","SCL"],airlines:["LATAM","GOL","Azul"],exec:false,programs:"LatamPass",tip:"Conexões via GRU ou Santiago."},
+  {iata:"CWB",city:"Curitiba",country:"Brasil",region:"Brasil",hubs:["GRU","SCL"],airlines:["LATAM","GOL","Azul"],exec:false,programs:"LatamPass",tip:"Conexões via GRU."},
+  {iata:"FLN",city:"Florianópolis",country:"Brasil",region:"Brasil",hubs:["GRU","SCL"],airlines:["LATAM","GOL","Azul"],exec:false,programs:"LatamPass",tip:"Conexões via GRU."},
+  {iata:"MAO",city:"Manaus",country:"Brasil",region:"Brasil",hubs:["GRU","MIA"],airlines:["LATAM","GOL","Azul"],exec:false,programs:"LatamPass",tip:"Voos domésticos + conexão GRU para internacionais."},
+  {iata:"MIA",city:"Miami",country:"EUA",region:"América do Norte e Caribe",hubs:["GRU","EWR","LAX","JFK","ORD"],airlines:["American Airlines","LATAM","GOL","Azul"],exec:true,programs:"Smiles (AA 7,5k)",tip:"Principal hub AA para América do Sul. Smiles AA é a pedida: 7,5k/trecho eco, 25k-57,5k exec."},
+  {iata:"JFK",city:"Nova York (JFK)",country:"EUA",region:"América do Norte e Caribe",hubs:["GRU","LHR","CDG","NRT","LAX"],airlines:["American","Delta","British","Air France","LATAM"],exec:true,programs:"Smiles (AA) / FlyingBlue (DL)",tip:"AA e Delta dominam. Smiles para AA. Delta via TF Latam ou FlyingBlue."},
+  {iata:"EWR",city:"Newark",country:"EUA",region:"América do Norte e Caribe",hubs:["GRU","LHR","FRA","NRT"],airlines:["United","Azul","LATAM"],exec:true,programs:"Azulpelomundo (United)",tip:"Hub United. Azul voa direto GRU→EWR. Emitir com Azulpelomundo ou Miles&Go."},
+  {iata:"LAX",city:"Los Angeles",country:"EUA",region:"América do Norte e Caribe",hubs:["GRU","MIA","EWR","JFK","NRT","HND","SYD"],airlines:["American","United","Delta","LATAM","Air New Zealand","Qantas"],exec:true,programs:"Smiles (AA) / Azulpelomundo (UA)",tip:"Conexão obrigatória para Oceania e Ásia. AA e United dominam."},
+  {iata:"ORD",city:"Chicago (O'Hare)",country:"EUA",region:"América do Norte e Caribe",hubs:["GRU","MIA","EWR","FRA"],airlines:["American","United","Lufthansa","LATAM"],exec:true,programs:"Smiles (AA) / Azulpelomundo (UA)",tip:"Hub AA e United. Conexão para interiores dos EUA."},
+  {iata:"MCO",city:"Orlando",country:"EUA",region:"América do Norte e Caribe",hubs:["MIA","EWR","VCP","GRU"],airlines:["American","United","Azul","LATAM"],exec:false,programs:"Smiles (AA) / Azulpelomundo (UA)",tip:"Azul voa VCP→MCO diretamente! Emitir com Azulpelomundo. Ou via Miami com AA+Smiles."},
+  {iata:"FLL",city:"Fort Lauderdale",country:"EUA",region:"América do Norte e Caribe",hubs:["MIA","VCP","GRU"],airlines:["Azul","Spirit","JetBlue"],exec:false,programs:"Azulpelomundo",tip:"Azul voa VCP→FLL direto! Alternativa barata a Miami."},
+  {iata:"IAH",city:"Houston",country:"EUA",region:"América do Norte e Caribe",hubs:["GRU","EWR","LAX"],airlines:["United","LATAM"],exec:true,programs:"Azulpelomundo (UA)",tip:"Hub United. Conexão para América Central, México e interiores dos EUA."},
+  {iata:"ATL",city:"Atlanta",country:"EUA",region:"América do Norte e Caribe",hubs:["GRU","MIA","CDG"],airlines:["Delta","Air France","LATAM"],exec:true,programs:"FlyingBlue (DL) / TF Latam",tip:"Maior hub Delta do mundo. Delta via FlyingBlue ou TF Latam (regra N O)."},
+  {iata:"DFW",city:"Dallas",country:"EUA",region:"América do Norte e Caribe",hubs:["GRU","MIA","LAX"],airlines:["American Airlines","LATAM"],exec:true,programs:"Smiles (AA)",tip:"Hub AA. Conexão para México, Caribe e interiores EUA."},
+  {iata:"BOS",city:"Boston",country:"EUA",region:"América do Norte e Caribe",hubs:["GRU","LHR","DUB"],airlines:["American","Delta","British","Aer Lingus"],exec:true,programs:"Smiles (AA) / Avios (BA)",tip:"AA, Delta e British Airways operam."},
+  {iata:"SFO",city:"São Francisco",country:"EUA",region:"América do Norte e Caribe",hubs:["GRU","LAX","EWR","NRT","PEK"],airlines:["United","Air China","LATAM","ANA"],exec:true,programs:"Azulpelomundo (UA)",tip:"Hub United para Ásia/Pacífico. United via Azulpelomundo."},
+  {iata:"LAS",city:"Las Vegas",country:"EUA",region:"América do Norte e Caribe",hubs:["LAX","MIA","JFK"],airlines:["American","Delta","United","Spirit"],exec:false,programs:"Smiles ou Azulpelomundo via conexão",tip:"Não tem voo direto do Brasil. Conectar em LAX ou MIA."},
+  {iata:"SEA",city:"Seattle",country:"EUA",region:"América do Norte e Caribe",hubs:["LAX","EWR","NRT"],airlines:["Alaska Airlines","Delta","United","Emirates"],exec:true,programs:"MileagePlan (Alaska) / Azulpelomundo",tip:"Hub Alaska Airlines. Mileage Plan é excelente para Ásia via Alaska/OneWorld."},
+  {iata:"CUN",city:"Cancún",country:"México",region:"América do Norte e Caribe",hubs:["MIA","MEX","GRU","BOG"],airlines:["American","Aeromexico","LATAM","Copa"],exec:false,programs:"Smiles (AA) / LatamPass",tip:"AA via Miami. LATAM e Copa com tabela fixa. Aeromexico via Smiles ou FlyingBlue."},
+  {iata:"MEX",city:"Cidade do México",country:"México",region:"América do Norte e Caribe",hubs:["MIA","LAX","EWR","BOG"],airlines:["Aeromexico","American","United","LATAM"],exec:true,programs:"Smiles (AA) / FlyingBlue (AM)",tip:"Hub Aeromexico. Emitir AM via Smiles, FlyingBlue ou Suma Call Center."},
+  {iata:"HAV",city:"Havana",country:"Cuba",region:"América do Norte e Caribe",hubs:["MIA","MEX","PTY"],airlines:["American","Aeromexico","Copa"],exec:false,programs:"Smiles (AA) / ConnectMiles (Copa)",tip:"Copa via Panamá é a rota mais fácil do Brasil."},
+  {iata:"SJU",city:"San Juan (Porto Rico)",country:"EUA",region:"América do Norte e Caribe",hubs:["MIA","JFK","EWR"],airlines:["American","JetBlue","United"],exec:false,programs:"Smiles (AA)",tip:"AA via Miami é a melhor rota."},
+  {iata:"PTY",city:"Cidade do Panamá",country:"Panamá",region:"América do Norte e Caribe",hubs:["GRU","GIG","BOG","MIA"],airlines:["Copa Airlines","LATAM"],exec:true,programs:"Smiles / Azulpelomundo / ConnectMiles",tip:"Hub Copa. Excelente conexão para toda a América do Norte e Central."},
+  {iata:"PUJ",city:"Punta Cana",country:"Rep. Dominicana",region:"América do Norte e Caribe",hubs:["MIA","JFK","GRU","BOG"],airlines:["American","LATAM","Copa","JetBlue"],exec:false,programs:"Smiles (AA) / LatamPass",tip:"AA via Miami ou LATAM direto de GRU."},
+  {iata:"LHR",city:"Londres (Heathrow)",country:"Reino Unido",region:"Europa",hubs:["GRU","GIG","MIA","JFK","DXB","HKG","SIN","NRT"],airlines:["British Airways","LATAM","American","Virgin Atlantic","Emirates","Cathay","Singapore","ANA"],exec:true,programs:"Avios (BA) / Smiles",tip:"Hub British Airways e Virgin. Avios varia 40k-90k exec. Virgin Flying Club excelente."},
+  {iata:"LGW",city:"Londres (Gatwick)",country:"Reino Unido",region:"Europa",hubs:["GRU","MIA"],airlines:["British Airways","Norwegian"],exec:false,programs:"Avios (BA)",tip:"Aeroporto secundário. Preferir LHR para milhas."},
+  {iata:"CDG",city:"Paris (Charles de Gaulle)",country:"França",region:"Europa",hubs:["GRU","GIG","MIA","JFK","DXB","NRT","PEK"],airlines:["Air France","LATAM","Delta","Emirates","Cathay","Air China"],exec:true,programs:"FlyingBlue",tip:"Hub Air France/KLM. FlyingBlue é ótimo programa; promoções mensais."},
+  {iata:"LIS",city:"Lisboa",country:"Portugal",region:"Europa",hubs:["GRU","GIG","FOR","REC","BSB","JFK","MIA","LHR"],airlines:["TAP Air Portugal","LATAM","Azul","GOL"],exec:true,programs:"Miles&Go / Smiles / Azulpelomundo",tip:"Hub TAP. TAP tem tabela fixa via Gol e Azul: 35k eco / Call Center. Muitos voos diretos do BR."},
+  {iata:"MAD",city:"Madri",country:"Espanha",region:"Europa",hubs:["GRU","GIG","MIA","LHR","CDG","DXB"],airlines:["Iberia","LATAM","Air Europa","British","American"],exec:true,programs:"Avios (IB) / LatamPass",tip:"Hub Iberia. Avios variável 6k-53k; TF Latam via Iberia. LATAM voa GRU→MAD."},
+  {iata:"BCN",city:"Barcelona",country:"Espanha",region:"Europa",hubs:["GRU","MIA","CDG","MAD"],airlines:["Vueling","Iberia","LATAM","Air France"],exec:false,programs:"Avios / LatamPass",tip:"Vueling (OneWorld) aceita Avios. LATAM sazonal do Brasil."},
+  {iata:"FRA",city:"Frankfurt",country:"Alemanha",region:"Europa",hubs:["GRU","EWR","JFK","DXB","NRT","PEK"],airlines:["Lufthansa","LATAM","United","Emirates","Air China"],exec:true,programs:"Miles&Go / LatamPass / Azulpelomundo",tip:"Hub Lufthansa (Star Alliance). Miles&Go e LatamPass para Lufthansa. LATAM voa GRU→FRA."},
+  {iata:"MUC",city:"Munique",country:"Alemanha",region:"Europa",hubs:["GRU","FRA","DXB"],airlines:["Lufthansa","Emirates"],exec:true,programs:"Miles&Go / LatamPass",tip:"Hub secundário Lufthansa. Conexões com toda a Europa Central."},
+  {iata:"AMS",city:"Amsterdã",country:"Holanda",region:"Europa",hubs:["GRU","JFK","DXB","NRT"],airlines:["KLM","Delta","LATAM","China Southern"],exec:true,programs:"FlyingBlue",tip:"Hub KLM (SkyTeam). FlyingBlue é o programa. LATAM voa GRU→AMS."},
+  {iata:"ZUR",city:"Zurique",country:"Suíça",region:"Europa",hubs:["GRU","FRA","LHR","DXB"],airlines:["Swiss","LATAM","Emirates"],exec:true,programs:"Miles&Go / Azulpelomundo",tip:"Hub Swiss (Star Alliance). Miles&Go e Azulpelomundo. LATAM voa GRU→ZUR."},
+  {iata:"VIE",city:"Viena",country:"Áustria",region:"Europa",hubs:["GRU","FRA","LHR","IST"],airlines:["Austrian","LATAM","Lufthansa","Turkish"],exec:true,programs:"Miles&Go / LatamPass",tip:"Austrian (Star Alliance). Hub para Europa Central e do Leste."},
+  {iata:"FCO",city:"Roma (Fiumicino)",country:"Itália",region:"Europa",hubs:["GRU","MIA","FRA","CDG","DXB"],airlines:["ITA Airways","LATAM","Lufthansa","Air France","Emirates"],exec:true,programs:"FlyingBlue / LatamPass",tip:"ITA Airways (SkyTeam). LATAM voa GRU→FCO."},
+  {iata:"MXP",city:"Milão (Malpensa)",country:"Itália",region:"Europa",hubs:["GRU","FRA","CDG","DXB"],airlines:["ITA Airways","LATAM","Emirates","Air France"],exec:true,programs:"FlyingBlue / LatamPass",tip:"Hub ITA Airways. LATAM sazonal."},
+  {iata:"IST",city:"Istambul",country:"Turquia",region:"Europa",hubs:["GRU","LHR","DXB","NRT","JFK"],airlines:["Turkish Airlines","LATAM"],exec:true,programs:"Smiles / Azulpelomundo / Miles&Go",tip:"Hub Turkish (Star Alliance). 30k milhas via Call Center. Conexão para 340+ destinos! Hub estratégico."},
+  {iata:"ARN",city:"Estocolmo",country:"Suécia",region:"Europa",hubs:["FRA","LHR","CPH"],airlines:["SAS","Lufthansa","British"],exec:true,programs:"Miles&Go / Azulpelomundo",tip:"Via Frankfurt ou Londres."},
+  {iata:"CPH",city:"Copenhague",country:"Dinamarca",region:"Europa",hubs:["FRA","LHR","ARN"],airlines:["SAS","Lufthansa","British"],exec:true,programs:"Miles&Go / Azulpelomundo",tip:"Via Frankfurt."},
+  {iata:"OSL",city:"Oslo",country:"Noruega",region:"Europa",hubs:["FRA","LHR","CPH"],airlines:["SAS","Lufthansa","Norwegian"],exec:false,programs:"Miles&Go / Azulpelomundo",tip:"Via Frankfurt ou Londres."},
+  {iata:"HEL",city:"Helsinki",country:"Finlândia",region:"Europa",hubs:["FRA","LHR","ARN"],airlines:["Finnair","Lufthansa","British"],exec:true,programs:"Avios (Finnair) / Miles&Go",tip:"Finnair (OneWorld). Excelente para conexões Ásia via HEL!"},
+  {iata:"WAW",city:"Varsóvia",country:"Polônia",region:"Europa",hubs:["FRA","LHR","IST"],airlines:["LOT Polish","Lufthansa","Turkish"],exec:true,programs:"Miles&Go / Smiles",tip:"LOT (Star Alliance). Via Frankfurt ou Istambul."},
+  {iata:"PRG",city:"Praga",country:"Rep. Tcheca",region:"Europa",hubs:["FRA","LHR","IST","VIE"],airlines:["Czech Airlines","Lufthansa","Turkish","Austrian"],exec:false,programs:"Miles&Go / Azulpelomundo",tip:"Via Frankfurt ou Viena."},
+  {iata:"BUD",city:"Budapeste",country:"Hungria",region:"Europa",hubs:["FRA","VIE","IST"],airlines:["Wizz Air","Lufthansa","Austrian","Turkish"],exec:false,programs:"Azulpelomundo via FRA",tip:"Via Viena ou Frankfurt."},
+  {iata:"ATH",city:"Atenas",country:"Grécia",region:"Europa",hubs:["FRA","LHR","CDG","IST"],airlines:["Aegean Airlines","Lufthansa","British","Air France","Turkish"],exec:true,programs:"Miles&Go / Avios",tip:"Aegean (Star Alliance). Via Frankfurt, Londres ou Istambul."},
+  {iata:"DUB",city:"Dublin",country:"Irlanda",region:"Europa",hubs:["LHR","JFK","BOS"],airlines:["Aer Lingus","British","American"],exec:true,programs:"Avios (Aer Lingus)",tip:"Aer Lingus (OneWorld). Avios aceito."},
+  {iata:"GVA",city:"Genebra",country:"Suíça",region:"Europa",hubs:["FRA","ZUR","LHR"],airlines:["Swiss","Lufthansa","British","LATAM"],exec:true,programs:"Miles&Go / Azulpelomundo",tip:"LATAM voa GRU→GVA. Swiss e Lufthansa via hubs."},
+  {iata:"EZE",city:"Buenos Aires",country:"Argentina",region:"América do Sul e Central",hubs:["GRU","SCL","BOG","MIA","MAD","CDG"],airlines:["LATAM","Aerolíneas Argentinas","Copa","Air Europa","Air France","Iberia","Turkish"],exec:true,programs:"LatamPass / Smiles / Avios",tip:"Hub regional crítico! Voos de 5 liberdades: Emirates, British, Swiss, Turkish, Air Canada, Ethiopian saem de AQUI mais baratos!"},
+  {iata:"SCL",city:"Santiago do Chile",country:"Chile",region:"América do Sul e Central",hubs:["GRU","MIA","LAX","MAD","SYD"],airlines:["LATAM","Sky Airline","Delta","Iberia","Air New Zealand"],exec:true,programs:"LatamPass / Avios",tip:"Hub LATAM para América do Sul. Conexão para Oceania via ANZ ou Qantas."},
+  {iata:"BOG",city:"Bogotá",country:"Colômbia",region:"América do Sul e Central",hubs:["GRU","MIA","PTY","JFK","MAD"],airlines:["Avianca","Copa","LATAM","American","Iberia"],exec:true,programs:"Smiles / Azulpelomundo / ConnectMiles",tip:"Hub Avianca (Star). Excelente conexão América do Sul→Centro→Norte."},
+  {iata:"LIM",city:"Lima",country:"Peru",region:"América do Sul e Central",hubs:["GRU","BOG","PTY","MIA","MAD"],airlines:["LATAM","Avianca","Copa","American","Iberia"],exec:true,programs:"LatamPass / ConnectMiles",tip:"Hub LATAM para Andes. Conexão para Ecuador, Chile, etc."},
+  {iata:"GYE",city:"Guayaquil",country:"Equador",region:"América do Sul e Central",hubs:["BOG","PTY","GRU","MIA"],airlines:["LATAM","Copa","Avianca"],exec:false,programs:"LatamPass / ConnectMiles",tip:"Via Bogotá ou Panamá."},
+  {iata:"MVD",city:"Montevidéu",country:"Uruguai",region:"América do Sul e Central",hubs:["GRU","EZE","SCL"],airlines:["LATAM","Gol","Azul"],exec:false,programs:"LatamPass / Smiles",tip:"Via São Paulo ou Buenos Aires."},
+  {iata:"ASU",city:"Assunção",country:"Paraguai",region:"América do Sul e Central",hubs:["GRU","EZE","SCL","BOG"],airlines:["LATAM","Copa","GOL"],exec:false,programs:"LatamPass / Smiles / ConnectMiles",tip:"Via GRU ou via Copa-PTY."},
+  {iata:"LPB",city:"La Paz",country:"Bolívia",region:"América do Sul e Central",hubs:["GRU","BOG","PTY","SCL"],airlines:["Boliviana de Aviación","Copa","LATAM"],exec:false,programs:"ConnectMiles / LatamPass",tip:"Via Copa-PTY ou LATAM-SCL."},
+  {iata:"CCS",city:"Caracas",country:"Venezuela",region:"América do Sul e Central",hubs:["BOG","PTY","MIA"],airlines:["Copa","Conviasa","American"],exec:false,programs:"ConnectMiles",tip:"Via Copa-PTY é a melhor opção."},
+  {iata:"GUA",city:"Cidade da Guatemala",country:"Guatemala",region:"América do Sul e Central",hubs:["PTY","MIA","BOG"],airlines:["Copa","American","Avianca"],exec:false,programs:"ConnectMiles / Smiles",tip:"Via Copa ou American."},
+  {iata:"SJO",city:"San José",country:"Costa Rica",region:"América do Sul e Central",hubs:["PTY","MIA","BOG"],airlines:["Copa","American","Avianca"],exec:false,programs:"ConnectMiles / Smiles",tip:"Via Copa ou American."},
+  {iata:"JNB",city:"Joanesburgo",country:"África do Sul",region:"África",hubs:["GRU","DXB","LHR","CDG","NBO","CPT"],airlines:["South African","Emirates","British","Air France","Kenya Airways","LATAM"],exec:true,programs:"Smiles / Azulpelomundo / Miles&Go",tip:"South African (Star Alliance). Via Emirates-DXB ou British-LHR. LATAM sazonal GRU→JNB."},
+  {iata:"CPT",city:"Cidade do Cabo",country:"África do Sul",region:"África",hubs:["JNB","DXB","LHR"],airlines:["South African","Emirates","British"],exec:true,programs:"Smiles / Azulpelomundo",tip:"Via Joanesburgo ou Dubai."},
+  {iata:"NBO",city:"Nairóbi",country:"Quênia",region:"África",hubs:["GRU","DXB","LHR","ADD"],airlines:["Kenya Airways","Emirates","British","Ethiopian"],exec:true,programs:"Smiles / Miles&Go",tip:"Kenya Airways (SkyTeam). Via Dubai ou Londres ou Adis Abeba."},
+  {iata:"ADD",city:"Adis Abeba",country:"Etiópia",region:"África",hubs:["GRU","DXB","LHR","NBO"],airlines:["Ethiopian Airlines","Emirates","British","LATAM"],exec:true,programs:"Miles&Go / Smiles / Azulpelomundo",tip:"Hub Ethiopian (Star Alliance). Maior hub da África! Conexão para 60+ destinos africanos. LATAM voa GRU→ADD!"},
+  {iata:"LOS",city:"Lagos",country:"Nigéria",region:"África",hubs:["DXB","LHR","CDG","ADD"],airlines:["Emirates","British","Air France","Ethiopian"],exec:false,programs:"Smiles / Miles&Go",tip:"Via Dubai, Londres ou Adis Abeba."},
+  {iata:"ABJ",city:"Abidjan",country:"Costa do Marfim",region:"África",hubs:["CDG","LIS","ADD","DXB"],airlines:["Air France","TAP","Ethiopian","Emirates"],exec:false,programs:"FlyingBlue / Miles&Go",tip:"Via Paris ou Lisboa."},
+  {iata:"DKR",city:"Dakar",country:"Senegal",region:"África",hubs:["LIS","CDG","CMN"],airlines:["TAP","Air France","Royal Air Maroc"],exec:false,programs:"Miles&Go / FlyingBlue",tip:"TAP voa LIS→DKR. Via Lisboa ou Paris."},
+  {iata:"CMN",city:"Casablanca",country:"Marrocos",region:"África",hubs:["LIS","MAD","CDG","LHR","JFK","DXB"],airlines:["Royal Air Maroc","TAP","Iberia","Air France","British","Emirates"],exec:true,programs:"Avios / FlyingBlue / Miles&Go",tip:"Royal Air Maroc (OneWorld). Hub para toda a África do Norte e Ocidental."},
+  {iata:"TUN",city:"Tunis",country:"Tunísia",region:"África",hubs:["CDG","FCO","FRA"],airlines:["Tunisair","Air France","ITA"],exec:false,programs:"FlyingBlue",tip:"Via Paris ou Roma."},
+  {iata:"CAI",city:"Cairo",country:"Egito",region:"África",hubs:["DXB","IST","LHR","FRA"],airlines:["EgyptAir","Emirates","Turkish","British","Lufthansa"],exec:true,programs:"Miles&Go / Smiles",tip:"EgyptAir (Star Alliance). Via Dubai ou Istambul."},
+  {iata:"ACC",city:"Acra",country:"Gana",region:"África",hubs:["LHR","CDG","ADD","DXB"],airlines:["British","Air France","Ethiopian","Emirates"],exec:false,programs:"Avios / FlyingBlue / Miles&Go",tip:"Via Londres, Paris ou Adis Abeba."},
+  {iata:"LAD",city:"Luanda",country:"Angola",region:"África",hubs:["GRU","LIS","DXB","ADD"],airlines:["TAAG Angola","TAP","Emirates","Ethiopian"],exec:true,programs:"Smiles / Azulpelomundo",tip:"TAAG parceira GOL e Azul. TAP voa LIS→LAD."},
+  {iata:"DXB",city:"Dubai",country:"Emirados Árabes",region:"Ásia e Oriente Médio",hubs:["GRU","LHR","JFK","LAX","SIN","HKG","BKK","NRT","SYD"],airlines:["Emirates","FlyDubai","LATAM"],exec:true,programs:"Smiles / Azulpelomundo / Miles&Go",tip:"Hub Emirates (independente). 5 liberdades de Buenos Aires mais baratos! Smiles e Azulpelomundo para Emirates."},
+  {iata:"AUH",city:"Abu Dhabi",country:"Emirados Árabes",region:"Ásia e Oriente Médio",hubs:["LHR","CDG","FRA","NRT","SIN"],airlines:["Etihad Airways","British","Air France","Lufthansa","ANA"],exec:true,programs:"Smiles / Azulpelomundo",tip:"Etihad hub. Parceiro de vários programas."},
+  {iata:"DOH",city:"Doha",country:"Qatar",region:"Ásia e Oriente Médio",hubs:["GRU","LHR","CDG","FRA","NRT","SIN","SYD"],airlines:["Qatar Airways","LATAM"],exec:true,programs:"LatamPass / Avios / AAdvantage",tip:"Hub Qatar (OneWorld). LATAM voa GRU→DOH. Avios e LatamPass. Executiva Qatar é top 4!"},
+  {iata:"IST",city:"Istambul",country:"Turquia",region:"Ásia e Oriente Médio",hubs:["GRU","LHR","DXB","NRT","JFK","LAX"],airlines:["Turkish Airlines","LATAM"],exec:true,programs:"Smiles / Azulpelomundo / Miles&Go",tip:"Hub Turkish (Star Alliance). 30k milhas eco via Call Center. Conecta 340+ destinos. Mega hub estratégico!"},
+  {iata:"TLV",city:"Tel Aviv",country:"Israel",region:"Ásia e Oriente Médio",hubs:["LHR","FRA","CDG","IST","ATH"],airlines:["El Al","British","Lufthansa","Air France","Turkish"],exec:true,programs:"Avios / Miles&Go / Smiles",tip:"El Al não é membro de aliança mas aceita parceiros. Via hub europeu + conexão."},
+  {iata:"RUH",city:"Riad",country:"Arábia Saudita",region:"Ásia e Oriente Médio",hubs:["DXB","LHR","FRA","IST"],airlines:["Saudia","Emirates","British","Lufthansa","Turkish"],exec:true,programs:"Smiles / Miles&Go",tip:"Saudia (SkyTeam). Via Dubai ou hub europeu."},
+  {iata:"KWI",city:"Kuwait",country:"Kuwait",region:"Ásia e Oriente Médio",hubs:["DXB","IST","LHR"],airlines:["Kuwait Airways","Emirates","Turkish","British"],exec:false,programs:"Smiles / Miles&Go",tip:"Via Dubai ou Istambul."},
+  {iata:"DEL",city:"Nova Delhi",country:"Índia",region:"Ásia e Oriente Médio",hubs:["DXB","LHR","FRA","IST","SIN","EWR"],airlines:["Air India","Emirates","British","Lufthansa","Turkish","United","Singapore"],exec:true,programs:"Miles&Go / Smiles / Azulpelomundo",tip:"Air India (Star Alliance). Via Dubai, Londres ou Frankfurt. United voa EWR→DEL."},
+  {iata:"BOM",city:"Mumbai",country:"Índia",region:"Ásia e Oriente Médio",hubs:["DXB","LHR","FRA","IST"],airlines:["Air India","Emirates","British","Lufthansa","Turkish"],exec:true,programs:"Miles&Go / Smiles",tip:"Via Dubai ou hub europeu."},
+  {iata:"BKK",city:"Bangkok",country:"Tailândia",region:"Ásia e Oriente Médio",hubs:["DXB","SIN","HKG","NRT","LHR"],airlines:["Thai Airways","Emirates","Singapore","Cathay","ANA","British"],exec:true,programs:"Miles&Go / Avios / Smiles",tip:"Thai (Star Alliance). Via Dubai, Singapura ou Hong Kong. Executiva Cathay ou Qatar são as melhores para conectar."},
+  {iata:"KUL",city:"Kuala Lumpur",country:"Malásia",region:"Ásia e Oriente Médio",hubs:["DXB","SIN","HKG","NRT"],airlines:["Malaysia Airlines","Emirates","Singapore","Cathay","ANA"],exec:true,programs:"Avios / Smiles / Miles&Go",tip:"Malaysia (OneWorld). Via Dubai ou Singapura."},
+  {iata:"SIN",city:"Singapura",country:"Singapura",region:"Ásia e Oriente Médio",hubs:["DXB","LHR","HKG","NRT","SYD","MEL","DEL"],airlines:["Singapore Airlines","British","Cathay","ANA","Emirates","Qantas"],exec:true,programs:"KrisFlyer / Avios / Miles&Go",tip:"Hub Singapore Airlines (Star). Executiva Singapore é a MELHOR DO MUNDO! KrisFlyer é o programa."},
+  {iata:"HKG",city:"Hong Kong",country:"China",region:"Ásia e Oriente Médio",hubs:["LHR","NRT","SIN","SYD","DXB","LAX"],airlines:["Cathay Pacific","British","ANA","Singapore","Qantas","Emirates"],exec:true,programs:"Avios / AAdvantage / MileagePlan",tip:"Hub Cathay Pacific (OneWorld). Executiva top 3! Avios e AAdvantage."},
+  {iata:"PVG",city:"Xangai",country:"China",region:"Ásia e Oriente Médio",hubs:["LAX","SFO","NRT","HKG","SIN","FRA"],airlines:["Air China","Eastern","Delta","United","Lufthansa","Singapore"],exec:true,programs:"Miles&Go / Azulpelomundo",tip:"Air China e Eastern (SkyTeam). Via hubs EUA ou Japan."},
+  {iata:"PEK",city:"Pequim",country:"China",region:"Ásia e Oriente Médio",hubs:["LAX","SFO","FRA","NRT","SIN"],airlines:["Air China","United","Lufthansa","ANA","Singapore"],exec:true,programs:"Miles&Go / Azulpelomundo",tip:"Air China (Star Alliance). Via hub EUA ou Europa + China Eastern."},
+  {iata:"ICN",city:"Seul",country:"Coreia do Sul",region:"Ásia e Oriente Médio",hubs:["LAX","SFO","NRT","SIN","HKG","DXB"],airlines:["Korean Air","Asiana","Delta","United","Singapore","Emirates"],exec:true,programs:"Smiles (Korean) / FlyingBlue",tip:"Korean Air (SkyTeam). Delta e Korean são parceiros. Asiana (Star). Smiles aceita Korean Air!"},
+  {iata:"NRT",city:"Tóquio (Narita)",country:"Japão",region:"Ásia e Oriente Médio",hubs:["LAX","SFO","SIN","HKG","ICN","LHR"],airlines:["ANA","Japan Airlines","United","British","Singapore","Cathay"],exec:true,programs:"Azulpelomundo (ANA) / Avios (JAL)",tip:"ANA (Star) e JAL (OneWorld). Executivas top 5 e 6! United via EWR conecta. Mileage Plan Alaska para JAL é ótimo."},
+  {iata:"HND",city:"Tóquio (Haneda)",country:"Japão",region:"Ásia e Oriente Médio",hubs:["LAX","SFO","SIN","LHR","CDG"],airlines:["ANA","Japan Airlines","Delta","British","Air France"],exec:true,programs:"Azulpelomundo / Avios / FlyingBlue",tip:"Aeroporto mais próximo do centro. ANA e JAL. Executivas incríveis!"},
+  {iata:"KIX",city:"Osaka",country:"Japão",region:"Ásia e Oriente Médio",hubs:["NRT","ICN","HKG","SIN"],airlines:["ANA","Japan Airlines","Korean","Cathay","Singapore"],exec:true,programs:"Azulpelomundo / Avios",tip:"Via Tóquio ou conexão direta de Seul/Singapura."},
+  {iata:"TPE",city:"Taipei",country:"Taiwan",region:"Ásia e Oriente Médio",hubs:["NRT","HKG","SIN","LAX"],airlines:["China Airlines","EVA Air","JAL","Cathay","Singapore"],exec:true,programs:"Avios / Miles&Go",tip:"EVA Air (Star Alliance). China Airlines (SkyTeam). Via Japão ou Hong Kong."},
+  {iata:"MNL",city:"Manila",country:"Filipinas",region:"Ásia e Oriente Médio",hubs:["HKG","SIN","NRT","DXB"],airlines:["Philippine Airlines","Cathay","Singapore","ANA","Emirates"],exec:true,programs:"Avios / Miles&Go",tip:"Via Hong Kong, Singapura ou Dubai."},
+  {iata:"CGK",city:"Jacarta",country:"Indonésia",region:"Ásia e Oriente Médio",hubs:["SIN","HKG","NRT","DXB"],airlines:["Garuda","Singapore","Cathay","ANA","Emirates"],exec:true,programs:"Smiles (Garuda) / Miles&Go",tip:"Garuda (SkyTeam). Smiles aceita Garuda! Via Singapura ou Dubai."},
+  {iata:"CMB",city:"Colombo",country:"Sri Lanka",region:"Ásia e Oriente Médio",hubs:["DXB","SIN","LHR"],airlines:["SriLankan Airlines","Emirates","Singapore","British"],exec:true,programs:"AAdvantage / Miles&Go",tip:"SriLankan (OneWorld). Via Dubai ou Singapura."},
+  {iata:"KTM",city:"Katmandu",country:"Nepal",region:"Ásia e Oriente Médio",hubs:["DEL","DXB","DOH"],airlines:["Nepal Airlines","Air India","Emirates","Qatar"],exec:false,programs:"Miles&Go / Smiles",tip:"Via Nova Delhi ou Dubai."},
+  {iata:"SYD",city:"Sydney",country:"Austrália",region:"Oceânia",hubs:["LAX","SIN","HKG","DXB","LHR","SCL","AKL"],airlines:["Qantas","Singapore","Cathay","Emirates","British","LATAM","Air New Zealand"],exec:true,programs:"LatamPass / Avios / KrisFlyer",tip:"Qantas (OneWorld). Via Dubai (Emirates), Singapura ou Los Angeles. LATAM voa SCL→SYD! Executiva Qantas é muito boa."},
+  {iata:"MEL",city:"Melbourne",country:"Austrália",region:"Oceânia",hubs:["LAX","SIN","HKG","DXB","AKL"],airlines:["Qantas","Singapore","Cathay","Emirates","Air New Zealand"],exec:true,programs:"LatamPass / Avios / KrisFlyer",tip:"Via Dubai, Singapura ou Los Angeles."},
+  {iata:"BNE",city:"Brisbane",country:"Austrália",region:"Oceânia",hubs:["SYD","LAX","SIN","DXB"],airlines:["Qantas","Singapore","Emirates"],exec:true,programs:"LatamPass / Avios",tip:"Via Sydney ou Los Angeles."},
+  {iata:"AKL",city:"Auckland",country:"Nova Zelândia",region:"Oceânia",hubs:["SYD","LAX","SIN","NAN"],airlines:["Air New Zealand","Qantas","Singapore","LATAM"],exec:true,programs:"LatamPass / Avios / MileagePlan",tip:"Air New Zealand (Star Alliance). Via Los Angeles ou Sydney. LATAM voa SCL→AKL!"},
+  {iata:"CHC",city:"Christchurch",country:"Nova Zelândia",region:"Oceânia",hubs:["SYD","AKL","LAX"],airlines:["Air New Zealand","Qantas"],exec:true,programs:"LatamPass / MileagePlan",tip:"Via Auckland."},
+  {iata:"NAN",city:"Fiji (Nadi)",country:"Fiji",region:"Oceânia",hubs:["SYD","LAX","AKL"],airlines:["Fiji Airways","Qantas","Air New Zealand"],exec:false,programs:"LatamPass / Avios",tip:"Fiji Airways (OneWorld). Via Sydney ou Los Angeles."},
+  {iata:"PPT",city:"Taiti",country:"Polinésia Francesa",region:"Oceânia",hubs:["LAX","AKL","SYD"],airlines:["Air Tahiti Nui","United","Air New Zealand","Qantas"],exec:false,programs:"Azulpelomundo (UA) / LatamPass",tip:"Via Los Angeles. Destino paradisíaco de luxo!"}
+];
+
+// Total: 110 aeroportos
+
+// ═══════════════════════════════════════════
+// BASE DE COMPANHIAS AÉREAS
+// ═══════════════════════════════════════════
+const airlines = [
+  {name:"United Airlines",iata:"UA",alliance:"Star Alliance",programs:["Azulpelomundo","Miles&Go","Aeroplan","ConnectMiles","MileagePlus","Smiles"],regions:["América do Norte e Caribe","América do Sul e Central","Ásia e Oriente Médio","Oceânia"],tip:"Hub EWR/ORD/IAH/SFO. Azul voa VCP→EWR direto! Emitir United: Azulpelomundo ou Miles&Go."},
+  {name:"Lufthansa",iata:"LH",alliance:"Star Alliance",programs:["Miles&Go","LatamPass","Azulpelomundo","ConnectMiles","Aeroplan"],regions:["Europa","Ásia e Oriente Médio"],tip:"Hub FRA/MUC. LATAM voa GRU→FRA. Emitir: Miles&Go, LatamPass ou Azulpelomundo."},
+  {name:"Swiss",iata:"LX",alliance:"Star Alliance",programs:["Azulpelomundo","Miles&Go","LatamPass"],regions:["Europa","América do Sul e Central"],tip:"Parceira grupo Lufthansa. Hub ZUR. LATAM voa GRU→ZUR. Voos de 5ª liberdade de EZE."},
+  {name:"TAP Air Portugal",iata:"TP",alliance:"Star Alliance",programs:["Miles&Go","Azulpelomundo","Smiles","Aeroplan","ConnectMiles"],regions:["Europa","África","América do Sul e Central"],tip:"Tabela fixa TAP via Gol e Azul: 35k/trecho eco, Call Center obrigatório. Muitos voos do Brasil (GRU, GIG, FOR, REC, BSB)."},
+  {name:"Turkish Airlines",iata:"TK",alliance:"Star Alliance",programs:["Smiles","Azulpelomundo","Miles&Go","Aeroplan"],regions:["Europa","Ásia e Oriente Médio","África","América do Sul e Central"],tip:"340+ destinos. Hub IST. GRU→IST direto. 30k milhas eco via Call Center (Smiles). Voos de 5ª liberdade de EZE."},
+  {name:"Ethiopian Airlines",iata:"ET",alliance:"Star Alliance",programs:["Miles&Go","Smiles","Azulpelomundo","ConnectMiles","Aeroplan"],regions:["África","Ásia e Oriente Médio"],tip:"Hub ADD - maior hub da África. LATAM voa GRU→ADD! Emitir: Miles&Go ou Smiles."},
+  {name:"South African Airways",iata:"SA",alliance:"Star Alliance",programs:["Smiles","Azulpelomundo","Miles&Go","Aeroplan"],regions:["África"],tip:"Hub JNB. Parceiro GOL e Azul. Via Dubai ou Londres."},
+  {name:"Air Canada",iata:"AC",alliance:"Star Alliance",programs:["Aeroplan","LatamPass","Avios"],regions:["América do Norte e Caribe","Oceânia"],tip:"Hub YYZ. Aeroplan aceito por Azulpelomundo. Voos de 5ª liberdade de EZE."},
+  {name:"Copa Airlines",iata:"CM",alliance:"Star Alliance",programs:["Smiles","Azulpelomundo","Miles&Go","ConnectMiles","Aeroplan","MileagePlus","FlyingBlue"],regions:["América do Norte e Caribe","América do Sul e Central"],tip:"Hub PTY - Hub das Américas. Tabela fixa 12.500 milhas. Parceiro GOL e AZUL."},
+  {name:"Avianca",iata:"AV",alliance:"Star Alliance",programs:["Smiles","Azulpelomundo","Miles&Go","Aeroplan","ConnectMiles"],regions:["América do Sul e Central"],tip:"Hub BOG. ConnectMiles/Lifemiles é o programa próprio. Via Smiles 12k."},
+  {name:"Singapore Airlines",iata:"SQ",alliance:"Star Alliance",programs:["KrisFlyer","Miles&Go","Azulpelomundo"],regions:["Ásia e Oriente Médio","Oceânia"],tip:"Executiva #1 do mundo. Hub SIN. Via DXB ou LAX. KrisFlyer é o programa principal."},
+  {name:"ANA",iata:"NH",alliance:"Star Alliance",programs:["Azulpelomundo","Miles&Go","MileagePlus"],regions:["Ásia e Oriente Médio"],tip:"Executiva top 5. Hub NRT/HND. Via LAX (United). Emitir ANA: Azulpelomundo."},
+  {name:"Air China",iata:"CA",alliance:"Star Alliance",programs:["Pagante"],regions:["Ásia e Oriente Médio","Oceânia"],tip:"Hub PEK/PVG. Geralmente mais vantajoso pagar em dinheiro."},
+  {name:"American Airlines",iata:"AA",alliance:"OneWorld",programs:["Smiles","MileagePlan","Avios","AAdvantage"],regions:["América do Norte e Caribe","Oceânia","África","Ásia e Oriente Médio","América do Sul e Central"],tip:"Hub MIA/DFW/ORD/JFK. Smiles AA = 7,5k/trecho eco. Tabela fixa AA disponível."},
+  {name:"British Airways",iata:"BA",alliance:"OneWorld",programs:["Avios","Smiles","Azulpelomundo","LatamPass","AAdvantage","MileagePlan"],regions:["Europa","América do Sul e Central","África","Ásia e Oriente Médio","Oceânia"],tip:"Hub LHR. Avios compartilhado com Iberia e Qatar. Voos de 5ª liberdade de EZE."},
+  {name:"Qatar Airways",iata:"QR",alliance:"OneWorld",programs:["LatamPass","Avios","AAdvantage","Azulpelomundo","MileagePlan"],regions:["Ásia e Oriente Médio","África","Oceânia","Europa"],tip:"Executiva top 4. Hub DOH. LATAM voa GRU→DOH. Avios e LatamPass para emitir."},
+  {name:"Royal Air Maroc",iata:"AT",alliance:"OneWorld",programs:["Azulpelomundo","AAdvantage","Avios"],regions:["África"],tip:"Hub CMN. Parceira OneWorld. Para África do Norte e Ocidental."},
+  {name:"Iberia",iata:"IB",alliance:"OneWorld",programs:["Avios","Azulpelomundo","LatamPass","Smiles","AAdvantage"],regions:["Europa","América do Sul e Central"],tip:"Hub MAD. Avios variável 6k-53k. TF Latam via Ibéria. LATAM voa GRU→MAD. Site Alaska para buscar voos LATAM."},
+  {name:"LATAM Airlines",iata:"LA",alliance:"OneWorld",programs:["LatamPass","Avios","MileagePlus","Miles&Go"],regions:["América do Sul e Central","Europa","América do Norte e Caribe","Oceânia","África"],tip:"Hub GRU/SCL. Latam reina na América do Sul! 15 parceiros com tabela fixa."},
+  {name:"Qantas",iata:"QF",alliance:"OneWorld",programs:["LatamPass","Avios","MileagePlan"],regions:["Oceânia","Ásia e Oriente Médio"],tip:"Hub SYD. Via Santiago (SCL) - LATAM voa SCL→SYD. Executiva muito boa."},
+  {name:"Japan Airlines",iata:"JL",alliance:"OneWorld",programs:["MileagePlan","AAdvantage","Avios"],regions:["Ásia e Oriente Médio"],tip:"Executiva top 6. Hub NRT/HND. MileagePlan (Alaska) tem a melhor tabela para JAL!"},
+  {name:"Cathay Pacific",iata:"CX",alliance:"OneWorld",programs:["Avios","AAdvantage","MileagePlan"],regions:["Ásia e Oriente Médio","Oceânia"],tip:"Executiva top 3. Hub HKG. Via LHR ou DXB. Avios e AAdvantage para emitir."},
+  {name:"Finnair",iata:"AY",alliance:"OneWorld",programs:["Avios","AAdvantage"],regions:["Europa","Ásia e Oriente Médio"],tip:"Hub HEL. Rota mais curta Europa→Ásia via polo norte! Avios é o programa."},
+  {name:"Alaska Airlines",iata:"AS",alliance:"OneWorld",programs:["MileagePlan","AAdvantage"],regions:["América do Norte e Caribe"],tip:"Hub SEA. MileagePlan é excelente para emitir JAL e outros OneWorld. Use site Alaska para buscar LATAM."},
+  {name:"Delta Air Lines",iata:"DL",alliance:"SkyTeam",programs:["LatamPass","FlyingBlue","Suma"],regions:["América do Norte e Caribe","Ásia e Oriente Médio"],tip:"Hub ATL/JFK/LAX. Tabela fixa Latam para voos Delta (regra N O). FlyingBlue também."},
+  {name:"Air France",iata:"AF",alliance:"SkyTeam",programs:["FlyingBlue","Smiles","LatamPass"],regions:["Europa","América do Norte e Caribe","África","Ásia e Oriente Médio"],tip:"Hub CDG. FlyingBlue tem Flash Sales mensais incríveis! Air France voa GRU/GIG→CDG."},
+  {name:"KLM",iata:"KL",alliance:"SkyTeam",programs:["FlyingBlue","Smiles","LatamPass"],regions:["Europa","América do Norte e Caribe","Ásia e Oriente Médio"],tip:"Hub AMS. FlyingBlue compartilhado com Air France. LATAM voa GRU→AMS."},
+  {name:"Aeromexico",iata:"AM",alliance:"SkyTeam",programs:["Smiles","LatamPass","FlyingBlue","Suma"],regions:["América do Norte e Caribe","América do Sul e Central"],tip:"Hub MEX. Suma Call Center aceita vários programas. FlyingBlue e Smiles também."},
+  {name:"Virgin Atlantic",iata:"VS",alliance:"SkyTeam",programs:["FlyingBlue","Flying Club"],regions:["Europa","América do Norte e Caribe"],tip:"Hub LHR. Flying Club é o programa próprio. Excelente para buscar disponibilidade SkyTeam."},
+  {name:"Korean Air",iata:"KE",alliance:"SkyTeam",programs:["Smiles","FlyingBlue"],regions:["Ásia e Oriente Médio"],tip:"Hub ICN. Smiles aceita Korean Air! FlyingBlue também. Via LAX ou NRT."},
+  {name:"ITA Airways",iata:"AZ",alliance:"SkyTeam",programs:["FlyingBlue","LatamPass"],regions:["Europa"],tip:"Hub FCO/MXP. LATAM voa GRU→FCO. FlyingBlue para emitir."},
+  {name:"Emirates",iata:"EK",alliance:"Independente",programs:["Smiles","Azulpelomundo","Miles&Go","Aeroplan"],regions:["Ásia e Oriente Médio","África","Oceânia","Europa","América do Norte e Caribe"],tip:"Hub DXB. Executiva top 2! GRU→DXB direto. Mais barato de EZE (5ª liberdade)! Taxa de combustível nas emissões."},
+  {name:"TAAG Angola Airlines",iata:"DT",alliance:"Independente",programs:["Smiles","Azulpelomundo"],regions:["África"],tip:"Hub LAD. Parceiro GOL e Azul. Via Lisboa ou São Paulo."},
+  {name:"Azul Linhas Aéreas",iata:"AD",alliance:"Independente",programs:["Azulpelomundo","TudoAzul","ConnectMiles","MileagePlus","Aeroplan"],regions:["Brasil","América do Norte e Caribe","Oceânia","América do Sul e Central"],tip:"Hub VCP/GRU. Award: United 8,8k/13,5k; Copa 12,5k; TAP 35k; Turkish 30k; Emirates. Voo VCP→EWR e VCP→MCO/FLL direto!"},
+  {name:"GOL Linhas Aéreas",iata:"G3",alliance:"Independente",programs:["Smiles"],regions:["Brasil","América do Sul e Central"],tip:"Hub GRU. Smiles: AA 7,5k, Copa 12,5k, TAP 35k, Avianca 12k, Emirates e Turkish ⚠️ taxa."},
+  {name:"Garuda Indonesia",iata:"GA",alliance:"SkyTeam",programs:["Smiles","FlyingBlue"],regions:["Ásia e Oriente Médio"],tip:"Hub CGK (Jacarta). Smiles aceita Garuda! Via Singapura ou Dubai."},
+  {name:"EVA Air",iata:"BR",alliance:"Star Alliance",programs:["Miles&Go","Azulpelomundo"],regions:["Ásia e Oriente Médio"],tip:"Hub TPE (Taipei). Parceira Star Alliance. Via NRT ou SIN."},
+  {name:"Malaysia Airlines",iata:"MH",alliance:"OneWorld",programs:["Avios","AAdvantage","Smiles"],regions:["Ásia e Oriente Médio"],tip:"Hub KUL. OneWorld. Via Dubai ou Singapura."},
+  {name:"Philippine Airlines",iata:"PR",alliance:"OneWorld",programs:["Avios","AAdvantage"],regions:["Ásia e Oriente Médio"],tip:"Hub MNL. OneWorld. Via Hong Kong ou Singapura."},
+  {name:"SriLankan Airlines",iata:"UL",alliance:"OneWorld",programs:["AAdvantage","Miles&Go"],regions:["Ásia e Oriente Médio"],tip:"Hub CMB. OneWorld. Via Dubai ou Singapura."},
+  {name:"Air New Zealand",iata:"NZ",alliance:"Star Alliance",programs:["LatamPass","MileagePlan"],regions:["Oceânia"],tip:"Hub AKL. Parceira LATAM. Via SCL (LATAM voa SCL→AKL) ou LAX."},
+  {name:"Aerolineas Argentinas",iata:"AR",alliance:"SkyTeam",programs:["Smiles","Azulpelomundo","LatamPass","Suma"],regions:["América do Sul e Central"],tip:"Hub EZE. SkyTeam. Frequentemente mais vantajoso pagar em dinheiro ou usar Smiles."},
+  {name:"EgyptAir",iata:"MS",alliance:"Star Alliance",programs:["Miles&Go","Azulpelomundo"],regions:["África","Ásia e Oriente Médio"],tip:"Hub CAI. Star Alliance. Via Dubai ou Istambul."},
+  {name:"Kenya Airways",iata:"KQ",alliance:"SkyTeam",programs:["FlyingBlue","Smiles"],regions:["África"],tip:"Hub NBO. SkyTeam. Via Adis Abeba ou Dubai."},
+  {name:"Saudia",iata:"SV",alliance:"SkyTeam",programs:["Smiles","FlyingBlue"],regions:["Ásia e Oriente Médio"],tip:"Hub RUH. SkyTeam. Via Dubai ou hub europeu."},
+];
+
+// ═══════════════════════════════════════════
+// ROTAS RECOMENDADAS DO BRASIL
+// ═══════════════════════════════════════════
+const regionRoutes = {
+  "América do Norte e Caribe": {
+    icon:"🇺🇸", tip:"AA via Miami é a rota clássica com Smiles 7,5k/trecho. United via Newark com Azulpelomundo (Azul voa direto VCP→EWR!). Delta via tabela fixa Latam (regra N O).",
+    routes:[
+      {from:"GRU/VCP",via:"MIA",to:"Destino EUA",cia:"American Airlines",prog:"Smiles",custo:"7.500/trecho eco"},
+      {from:"VCP",via:"EWR",to:"Destino EUA",cia:"Azul + United",prog:"Azulpelomundo",custo:"8.800–13.500"},
+      {from:"GRU",via:"ATL",to:"Interior EUA",cia:"Delta",prog:"TF Latam (N O)",custo:"Consultar TF"},
+      {from:"GRU",via:"PTY",to:"América Central/Caribe",cia:"Copa Airlines",prog:"Smiles/ConnectMiles",custo:"12.500/trecho"},
+    ]
+  },
+  "América do Sul e Central": {
+    icon:"🌎", tip:"Latam reina! Muito provavelmente seu voo estará na tarifa comercial no próprio site da Latam. Para emissão em milhas, use LatamPass ou tabela fixa via Ibéria.",
+    routes:[
+      {from:"GRU",via:"SCL",to:"Destino Cone Sul",cia:"LATAM",prog:"LatamPass",custo:"Pagante ou TF"},
+      {from:"GRU",via:"BOG",to:"Am. Central/Norte",cia:"Avianca",prog:"Smiles/ConnectMiles",custo:"12.000"},
+      {from:"GRU",via:"PTY",to:"Am. Central/Caribe",cia:"Copa",prog:"ConnectMiles/Smiles",custo:"12.500/trecho"},
+    ]
+  },
+  "Europa": {
+    icon:"🇪🇺", tip:"TAP tem mais cidades diretas do Brasil. Lufthansa via Frankfurt é a grande conexão. Busque Star Alliance via United e emita com Azulpelomundo ou Miles&Go.",
+    routes:[
+      {from:"GRU/FOR/REC",via:"LIS",to:"Europa via Lisboa",cia:"TAP Air Portugal",prog:"Miles&Go / Smiles",custo:"35.000/trecho eco CC"},
+      {from:"GRU",via:"FRA",to:"Europa Central",cia:"Lufthansa",prog:"Miles&Go / LatamPass",custo:"TF Latam"},
+      {from:"GRU",via:"MAD",to:"Espanha/Europa",cia:"LATAM + Iberia",prog:"Avios / LatamPass",custo:"6k–53k Avios"},
+      {from:"GRU",via:"CDG",to:"França/Europa",cia:"Air France",prog:"FlyingBlue",custo:"Flash Sales mensais"},
+      {from:"GIG/GRU",via:"LHR",to:"Reino Unido",cia:"British Airways",prog:"Avios / Smiles",custo:"Variável Avios"},
+    ]
+  },
+  "África": {
+    icon:"🌍", tip:"Via Dubai (Emirates) é a rota mais cômoda para a maioria dos destinos africanos. Para África do Sul, Ethiopian via Adis Abeba ou South African via Star Alliance. LATAM voa GRU→ADD diretamente!",
+    routes:[
+      {from:"GRU",via:"DXB",to:"África Leste/Sul",cia:"Emirates",prog:"Smiles / Azulpelomundo",custo:"⚠️ taxa combustível"},
+      {from:"GRU",via:"ADD",to:"África toda",cia:"LATAM + Ethiopian",prog:"Miles&Go / Smiles",custo:"Consultar TF"},
+      {from:"GRU",via:"LIS",to:"África Lusófona",cia:"TAP",prog:"Miles&Go",custo:"35.000/trecho eco"},
+      {from:"GRU",via:"IST",to:"Norte da África",cia:"Turkish Airlines",prog:"Smiles (CC 30k)",custo:"30.000 eco CC"},
+    ]
+  },
+  "Ásia e Oriente Médio": {
+    icon:"🌏", tip:"Via Dubai (Emirates) ou Doha (Qatar) para o Oriente Médio e Sul da Ásia. Via Istambul (Turkish) para Europa oriental + Ásia. Para o Extremo Oriente (Japão/Coreia), via Los Angeles (AA/United) ou direto via Dubai.",
+    routes:[
+      {from:"GRU",via:"DXB",to:"Oriente Médio/Ásia",cia:"Emirates",prog:"Smiles / Azulpelomundo",custo:"⚠️ taxa combustível"},
+      {from:"GRU",via:"DOH",to:"Oriente Médio/Ásia",cia:"LATAM + Qatar",prog:"LatamPass / Avios",custo:"Consultar TF"},
+      {from:"GRU",via:"IST",to:"Turquia/Ásia",cia:"Turkish Airlines",prog:"Smiles (CC 30k)",custo:"30.000 eco CC"},
+      {from:"GRU",via:"LAX",to:"Japão/Coreia/Ásia",cia:"United + ANA/JAL",prog:"Azulpelomundo / MileagePlan",custo:"Consultar TF"},
+      {from:"EZE",via:"DXB",to:"Ásia (5ª Liberdade)",cia:"Emirates",prog:"Smiles",custo:"Mais barato de EZE!"},
+    ]
+  },
+  "Oceânia": {
+    icon:"🇦🇺", tip:"Via Dubai (Emirates) ou Los Angeles (United/AA) para Austrália e Nova Zelândia. LATAM voa GRU→SCL e de lá para SYD e AKL! Qantas via Santiago é ótima opção.",
+    routes:[
+      {from:"GRU",via:"DXB",to:"Austrália/NZ",cia:"Emirates",prog:"Smiles / Azulpelomundo",custo:"⚠️ taxa combustível"},
+      {from:"GRU",via:"SCL",to:"Sydney/Auckland",cia:"LATAM + Qantas/ANZ",prog:"LatamPass / Avios",custo:"Consultar TF"},
+      {from:"GRU",via:"LAX",to:"Austrália/NZ",cia:"United + ANZ/Qantas",prog:"Azulpelomundo",custo:"Consultar TF"},
+    ]
+  },
+  "Brasil": {
+    icon:"🇧🇷", tip:"Voucher Azul (TudoAzul), Voucher GOL (Smiles) e LatamPass são os programas para voos domésticos. Analise o Smarts vs Voucher para escolher o melhor custo-benefício.",
+    routes:[
+      {from:"GRU",via:"Direto",to:"Capitais BR",cia:"LATAM / GOL / Azul",prog:"LatamPass / Smiles / TudoAzul",custo:"Voucher ou Award"},
+    ]
+  }
+};
+
+// ═══════════════════════════════════════════
+// HUBS RÁPIDOS PARA BOTÕES
+// ═══════════════════════════════════════════
+const quickIATAs = ["MCO","MIA","LHR","CDG","LIS","MAD","FRA","IST","DXB","DOH","NRT","SIN","JNB","ADD","SYD","BOG","EZE","SCL"];
+
+// ═══════════════════════════════════════════
+// FUNÇÕES
+// ═══════════════════════════════════════════
+function badge(a){
+  const m={"Star Alliance":'<span class="badge bstar">⭐ Star</span>',"OneWorld":'<span class="badge bone">💎 OneWorld</span>',"SkyTeam":'<span class="badge bsky">🌐 SkyTeam</span>',"Independente":'<span class="badge bnone">✈️ Ind.</span>'};
+  return m[a]||'';
+}
+
+function showTab(id,el){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('section-'+id).classList.add('active');
+  if(el)el.classList.add('active');
+}
+
+// Inicializar quick IATAs
+window.addEventListener('DOMContentLoaded', () => {
+  const qw = document.getElementById('quickIatas');
+  quickIATAs.forEach(code => {
+    const btn = document.createElement('button');
+    btn.className = 'hub-chip';
+    btn.style.cssText = 'font-size:.72rem;padding:.22rem .55rem;border-radius:7px;';
+    btn.textContent = code;
+    btn.onclick = () => { document.getElementById('iataInput').value = code; searchIATA(); };
+    qw.appendChild(btn);
+  });
+});
+
+function searchIATA(){
+  const q = (document.getElementById('iataInput').value||'').trim().toUpperCase();
+  if(!q){document.getElementById('iataResult').innerHTML='';return;}
+  const apt = airports.find(a=>a.iata===q);
+  if(!apt){
+    document.getElementById('iataResult').innerHTML=`<div class="noR">❌ Aeroporto <strong>${q}</strong> não encontrado na base. Tente buscar pela cidade abaixo ou use <a href="https://www.seat.aero" target="_blank" style="color:var(--gold2)">Seats.aero</a> para disponibilidade manual.</div>`;
+    return;
+  }
+  renderIATAResult(apt);
+}
+
+function searchByCity(){
+  const q = document.getElementById('citySearch').value.trim().toLowerCase();
+  if(q.length<2){return;}
+  const results = airports.filter(a=>a.city.toLowerCase().includes(q)||a.country.toLowerCase().includes(q));
+  if(!results.length) return;
+  if(results.length===1){
+    document.getElementById('iataInput').value = results[0].iata;
+    renderIATAResult(results[0]);
+  } else {
+    document.getElementById('iataResult').innerHTML = `
+      <div style="margin-top:.5rem;font-size:.82rem;color:var(--muted);margin-bottom:.5rem">${results.length} aeroportos encontrados — clique para ver:</div>
+      <div class="tags">${results.map(a=>`<button class="hub-chip" onclick="document.getElementById('iataInput').value='${a.iata}';renderIATAResult(airports.find(x=>x.iata==='${a.iata}'))">${a.iata} — ${a.city}</button>`).join('')}</div>`;
+  }
+}
+
+function renderIATAResult(apt){
+  const rInfo = regionRoutes[apt.region]||{};
+  const hubNames = apt.hubs.map(h=>{
+    const found = airports.find(a=>a.iata===h);
+    return found ? `<button class="hub-chip" title="${found.city}" onclick="document.getElementById('iataInput').value='${h}';searchIATA()">${h}</button>` : `<button class="hub-chip">${h}</button>`;
+  }).join('');
+
+  const routeHTML = rInfo.routes ? rInfo.routes.map(r=>`
+    <div class="route-path">
+      <span class="rp-node">GRU/VCP</span><span class="rp-arrow">→</span>
+      <span class="rp-node">${r.via}</span><span class="rp-arrow">→</span>
+      <span class="rp-node">${apt.iata}</span>
+      <span class="rp-prog">${r.cia}</span>
+      <span class="rp-prog">${r.prog}</span>
+      ${r.custo?`<span class="rp-cost">💳 ${r.custo}</span>`:''}
+    </div>`).join('') : '';
+
+  // Find airlines that fly to this region
+  const relAirlines = airlines.filter(a=>a.regions.includes(apt.region)).slice(0,6);
+
+  document.getElementById('iataResult').innerHTML = `
+    <div class="iata-result">
+      <div class="ir-header">
+        <div style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap">
+          <div style="background:rgba(245,200,66,.2);border:2px solid rgba(245,200,66,.5);color:var(--gold);font-family:'Cormorant Garamond',serif;font-size:2.2rem;font-weight:700;padding:.25rem .7rem;border-radius:10px;letter-spacing:4px">${apt.iata}</div>
+          <div>
+            <div class="ir-city">${apt.city}</div>
+            <div class="ir-meta">
+              <span>${apt.country}</span>
+              <span class="ir-badge">${apt.region}</span>
+              ${apt.exec?'<span class="exec-yes">✅ Executiva Disponível</span>':'<span class="exec-no">⚠️ Verificar Executiva</span>'}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="ir-body">
+        <div class="ir-grid">
+          <div class="ir-block">
+            <div class="ir-block-title"><span>💳</span> Melhor Programa</div>
+            <div style="font-size:1.05rem;font-weight:700;color:var(--navy);margin-bottom:.4rem">${apt.programs}</div>
+            <div style="font-size:.78rem;color:var(--muted)">${apt.airlines.slice(0,4).join(' · ')}</div>
+          </div>
+          <div class="ir-block">
+            <div class="ir-block-title"><span>🔗</span> Hubs de Conexão</div>
+            <div class="hub-chips">${hubNames}</div>
+          </div>
+          <div class="ir-block">
+            <div class="ir-block-title"><span>✈️</span> Cias que Operam</div>
+            <div class="tags">${apt.airlines.map(a=>`<span class="tag">${a}</span>`).join('')}</div>
+          </div>
+        </div>
+
+        <div class="route-box">
+          <div class="route-title">🗺️ Caminhos do Brasil para ${apt.iata} — ${apt.city}</div>
+          ${routeHTML||'<div style="color:rgba(255,255,255,.6);font-size:.83rem">Consulte disponibilidade no Seats.aero para esta região.</div>'}
+        </div>
+
+        <div class="tipbox">💡 <strong>Dica de Ouro para ${apt.region}:</strong> ${rInfo.tip||apt.tip}</div>
+        ${apt.tip && rInfo.tip ? `<div class="tipbox green" style="margin-top:.5rem">✈️ <strong>Sobre ${apt.city}:</strong> ${apt.tip}</div>` : ''}
+
+        ${apt.exec?`<div class="tipbox green" style="margin-top:.5rem">💺 <strong>Executiva:</strong> Este destino tem executiva disponível. Verifique no <a href="https://www.seat.aero" target="_blank">Seats.aero</a> a disponibilidade por programa. Programa recomendado: <strong>${apt.programs}</strong></div>`:''}
+
+        <div style="margin-top:1rem">
+          <div style="font-weight:700;color:var(--navy);font-size:.85rem;margin-bottom:.55rem;font-family:'Cormorant Garamond',serif;font-size:.95rem">✈️ Companhias relevantes para ${apt.region}:</div>
+          <div>${relAirlines.map(a=>`
+            <div class="acard" style="margin-bottom:.5rem">
+              <div class="ahead"><span class="aname">${a.name}</span>${badge(a.alliance)}</div>
+              <div class="prog-lbl">💳 Programas:</div>
+              <div class="tags">${a.programs.map((p,i)=>'<span class="tag'+(i<2?' hi':'')+'">'+p+'</span>').join('')}</div>
+              <div style="font-size:.8rem;color:var(--muted);margin-top:.35rem">💡 ${a.tip}</div>
+            </div>`).join('')}
+          </div>
+        </div>
+      </div>
+    </div>`;
+}
+
+function clearIATA(){
+  document.getElementById('iataInput').value='';
+  document.getElementById('citySearch').value='';
+  document.getElementById('iataResult').innerHTML='';
+}
+
+function searchAirline(){
+  const q = document.getElementById('airlineSearch').value.trim().toLowerCase();
+  const d = document.getElementById('searchResults');
+  if(!q){d.innerHTML='';return;}
+  const f = airlines.filter(a=>a.name.toLowerCase().includes(q)||a.iata.toLowerCase().includes(q)||a.programs.some(p=>p.toLowerCase().includes(q))||a.alliance.toLowerCase().includes(q));
+  if(!f.length){d.innerHTML='<div class="noR">🔍 Nenhum resultado para "'+q+'"</div>';return;}
+  d.innerHTML='<p style="color:var(--muted);font-size:.8rem;margin-bottom:.5rem">'+f.length+' resultado(s)</p>'+f.map(a=>`
+    <div class="acard">
+      <div class="ahead"><span class="aname">✈ ${a.name}</span><span style="color:var(--muted);font-size:.78rem;font-weight:600">${a.iata}</span>${badge(a.alliance)}</div>
+      <div class="prog-lbl">💳 Programas:</div>
+      <div class="tags">${a.programs.map((p,i)=>'<span class="tag'+(i<2?' hi':'')+'">'+p+'</span>').join('')}</div>
+      <div class="tipbox" style="margin-top:.5rem">💡 ${a.tip}</div>
+    </div>`).join('');
+}
+function clearSearch(){document.getElementById('airlineSearch').value='';document.getElementById('searchResults').innerHTML='';}
+
+function findRoute(){
+  const region = document.getElementById('regionSelect').value;
+  const op = document.getElementById('operatorSearch').value.trim().toLowerCase();
+  const d = document.getElementById('routeResults');
+  if(!region&&!op){d.innerHTML='';return;}
+  let f = airlines;
+  if(region) f=f.filter(a=>a.regions.includes(region));
+  if(op) f=f.filter(a=>a.name.toLowerCase().includes(op)||a.iata.toLowerCase().includes(op));
+  if(!f.length){d.innerHTML='<div class="noR">Nenhum resultado encontrado.</div>';return;}
+  const rInfo = region ? regionRoutes[region] : null;
+  let html='';
+  if(rInfo){
+    const rts = rInfo.routes.map(r=>`
+      <div class="route-path" style="margin-bottom:.4rem">
+        <span class="rp-node">GRU/VCP</span><span class="rp-arrow">→</span>
+        <span class="rp-node">${r.via}</span><span class="rp-arrow">→</span>
+        <span class="rp-node">${region.substring(0,8)}…</span>
+        <span class="rp-prog">${r.cia}</span>
+        <span class="rp-prog">${r.prog}</span>
+        ${r.custo?`<span class="rp-cost">💳 ${r.custo}</span>`:''}
+      </div>`).join('');
+    html = `<div class="route-box"><div class="route-title">${rInfo.icon} Rotas Recomendadas — ${region}</div>${rts}</div>
+    <div class="tipbox" style="margin-bottom:1rem">🔑 ${rInfo.tip}</div>`;
+  }
+  html += f.map(a=>`
+    <div class="roption best">
+      <div style="display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin-bottom:.5rem">
+        <strong style="color:var(--navy);font-family:'Cormorant Garamond',serif;font-size:1.05rem">${a.name}</strong>
+        ${badge(a.alliance)}
+        <span class="blbl">✨ ${a.programs[0]}</span>
+      </div>
+      <div class="tags">${a.programs.map(p=>`<span class="tag">${p}</span>`).join('')}</div>
+      <div style="font-size:.8rem;color:var(--muted);margin-top:.4rem">💡 ${a.tip}</div>
+    </div>`).join('');
+  d.innerHTML=html;
+}
+</script>
+</body>
+</html>
