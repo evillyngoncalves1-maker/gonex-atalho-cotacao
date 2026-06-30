@@ -231,6 +231,70 @@ footer span{color:var(--gold);font-weight:600}
 </style>
 </head>
 <body>
+
+<!-- ═══ TELA DE LOGIN (CONTROLE DE ACESSO) ═══ -->
+<div id="loginGate" style="position:fixed;inset:0;z-index:99999;background:linear-gradient(135deg,#0B1D3A,#1B2D5B);display:flex;align-items:center;justify-content:center;padding:1.5rem">
+  <div style="background:#fff;border-radius:20px;padding:2.5rem 2rem;max-width:380px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.4);text-align:center">
+    <div style="width:70px;height:70px;margin:0 auto 1rem">
+      <svg viewBox="0 0 16536 16536" xmlns="http://www.w3.org/2000/svg" style="fill-rule:evenodd;clip-rule:evenodd;width:100%;height:100%">
+        <rect x="0" y="0" width="16536" height="16536" style="fill:#0b1d3a" rx="2000"/>
+        <path d="M8529.745,8449.11l2186.633,4554.3l847.182,0l3031.724,-6054.568l-1920.925,0l-1498.434,3567.725l-820.012,-1996.052l-1826.168,-71.405Z" style="fill:#fff"/>
+        <path d="M9076.178,6446.451c0,0 -821.041,-1374.504 -2715.209,-1273.106c-1840.631,98.532 -2303.984,1470.269 -2303.984,1470.269c0,0 -666.128,1291.37 39.432,2740.559c705.56,1449.189 2458.892,1688.601 3902.406,1019.657l53.903,-1603.474l401.108,-9.351l1167.064,2537.686c0,0 -2522.947,2087.148 -5592.608,425.79c-3069.661,-1661.358 -1906.675,-5338.202 -1705.367,-5743.238c36.528,-73.496 789.436,-2034.84 3349.159,-2409.519c2723.005,-398.579 4253.566,1004.346 4756.542,1873.34l-1352.446,971.388Z" style="fill:#ffc107"/>
+        <path d="M6183.153,6978.14l-433.614,1617.71l4606.375,-74.803l-566.361,-1572.206l-3606.399,29.298Z" style="fill:#ffc107"/>
+      </svg>
+    </div>
+    <div style="font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:700;color:#0B1D3A;margin-bottom:.25rem">Gonex Viagens</div>
+    <div style="font-size:.8rem;color:#5A6A82;margin-bottom:1.5rem">Acesso restrito — Mapa de Emissões</div>
+    <input type="email" id="loginEmail" placeholder="Seu e-mail cadastrado" style="width:100%;padding:.75rem 1rem;border:2px solid #EDE8DC;border-radius:10px;font-size:.92rem;font-family:'Inter',sans-serif;outline:none;margin-bottom:.75rem;box-sizing:border-box" onkeydown="if(event.key==='Enter')checkLogin()">
+    <button onclick="checkLogin()" style="width:100%;background:#0B1D3A;color:#F5C842;border:none;padding:.8rem;border-radius:10px;font-weight:700;font-size:.92rem;cursor:pointer;font-family:'Inter',sans-serif">Entrar</button>
+    <div id="loginError" style="color:#e74c3c;font-size:.8rem;margin-top:.75rem;display:none">❌ E-mail não autorizado. Solicite acesso à Evillyn.</div>
+  </div>
+</div>
+
+<script>
+// ═══ CONTROLE DE ACESSO VIA SUPABASE ═══
+// Gerencie quem tem acesso direto na tabela "mapa_emissoes_acesso" no Supabase.
+// Para liberar alguém: insira uma linha com o e-mail (ativo = true).
+// Para revogar: marque ativo = false ou delete a linha. Não precisa mexer neste arquivo.
+const SUPABASE_URL = "https://xqsebzfgdizxjthnycgo.supabase.co";
+const SUPABASE_KEY = "sb_publishable_PAFpJGtjZkCpzjebZDFxmA_iLmlY41f";
+
+async function checkLogin(){
+  const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+  const btn = document.querySelector('#loginGate button');
+  const errEl = document.getElementById('loginError');
+  errEl.style.display = 'none';
+  if(!email){ return; }
+  btn.textContent = 'Verificando...';
+  btn.disabled = true;
+  try {
+    const resp = await fetch(
+      `${SUPABASE_URL}/rest/v1/mapa_emissoes_acesso?email=eq.${encodeURIComponent(email)}&ativo=eq.true&select=email`,
+      { headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` } }
+    );
+    const data = await resp.json();
+    if(Array.isArray(data) && data.length > 0){
+      sessionStorage.setItem('gonex_auth', email);
+      document.getElementById('loginGate').style.display = 'none';
+    } else {
+      errEl.style.display = 'block';
+    }
+  } catch(e){
+    errEl.textContent = '⚠️ Erro ao verificar acesso. Tente novamente.';
+    errEl.style.display = 'block';
+  }
+  btn.textContent = 'Entrar';
+  btn.disabled = false;
+}
+
+// Se já autenticado nesta sessão do navegador, pula a tela de login
+if(sessionStorage.getItem('gonex_auth')){
+  document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('loginGate').style.display = 'none';
+  });
+}
+</script>
+
 <header>
   <div class="header-inner">
     <div class="logo-wrap">
